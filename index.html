@@ -500,6 +500,8 @@ function buildPdfHtml(d) {
   const r = d.r;
   const isStoda = s.isStoda;
   const totalPct = isStoda ? (100 - r.adminFees * 100).toFixed(2) + '%' : '100.00%';
+  // Selling price = system price after discount (computed directly, not from input field)
+  const displaySellingPrice = Math.round(d.systemPrice * (1 - r.dis / 100));
   const yearFrom = r.yearFrom || 'DP-2';
   // yearStartIdx: index in rows array where year counting starts
   // INS-1 → find INS-1 index; DP-2 → find DP-2 index; DP-1 → 0
@@ -572,7 +574,7 @@ function buildPdfHtml(d) {
   <div class="ph-info-row ph-info-row-3">
     <div class="ph-info-cell"><span class="ph-info-lbl">المشروع :</span><span class="ph-info-val">${d.project}</span></div>
     <div class="ph-info-cell"><span class="ph-info-lbl">المبني :</span><span class="ph-info-val"></span></div>
-    <div class="ph-info-cell"><span class="ph-info-lbl">سعر الوحدة :</span><span class="ph-info-val">${fmtN(d.sellingPrice)}</span></div>
+    <div class="ph-info-cell"><span class="ph-info-lbl">سعر الوحدة :</span><span class="ph-info-val">${fmtN(displaySellingPrice)}</span></div>
   </div>
   <div class="ph-info-row ph-info-row-3">
     <div class="ph-info-cell"><span class="ph-info-lbl">رقم الوحدة :</span><span class="ph-info-val"></span></div>

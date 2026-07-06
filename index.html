@@ -579,7 +579,7 @@ function buildPdfHtml(d) {
   <div class="ph-info-row ph-info-row-3">
     <div class="ph-info-cell"><span class="ph-info-lbl">رقم الوحدة :</span><span class="ph-info-val"></span></div>
     <div class="ph-info-cell"><span class="ph-info-lbl">مساحة الوحدة :</span><span class="ph-info-val"></span></div>
-    <div class="ph-info-cell"><span class="ph-info-lbl">وديعة الصيانة :</span><span class="ph-info-val">${fmtN(s.maintAmt)}</span></div>
+    <div class="ph-info-cell"><span class="ph-info-lbl">وديعة الصيانة :</span><span class="ph-info-val">${fmtN(s.maintAmt + s.opsAmt)}</span></div>
   </div>
   <div class="ph-info-row ph-info-row-3">
     <div class="ph-info-cell"><span class="ph-info-lbl">نوع الوحدة :</span><span class="ph-info-val"></span></div>

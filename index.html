@@ -522,7 +522,8 @@ function buildSchedule(d) {
   const insN = r.insN;
   const allocated = dp1Amt + dp2Amt + insAmt * insN;
   const lastAmt = insAmt + (Math.round(base) - allocated);
-  const maintAmt = Math.round(systemPrice * r.maint);
+  const maintAmt  = Math.round(systemPrice * r.maint);
+  const maint2Amt = r.maint2 > 0 ? Math.round(systemPrice * r.maint2) : 0;
   const opsAmt = r.opsFees > 0 ? Math.round(systemPrice * r.opsFees) : 0;
   const rows = [];
   rows.push({ desc: 'DP-1', pct: fmtP(dp1Amt, base), amt: dp1Amt, date: r.dp1d, active: true });
@@ -535,7 +536,7 @@ function buildSchedule(d) {
       rows.push({ desc: `INS-${i}`, pct: fmtP(a, base), amt: a, date: addQtrs(insStartDate, i - 1), active: true });
     }
   }
-  return { rows, maintAmt, opsAmt, base, isStoda, adminAmt, r, systemPrice };
+  return { rows, maintAmt, maint2Amt, opsAmt, base, isStoda, adminAmt, r, systemPrice };
 }
 
 function buildPdfHtml(d) {
@@ -634,7 +635,8 @@ ${adminBlock}
   <thead><tr><th>النسبة</th><th>القسط</th><th>البنك</th><th>رقم الشيك</th><th colspan="2">وديعة الصيانة</th></tr></thead>
   <tbody>
     <tr><td>${(r.maint*100).toFixed(2)}%</td><td>${fmtN(s.maintAmt)}</td><td></td><td></td><td>القسط الأول</td><td>${r.maintDate}</td></tr>
-    ${r.opsFees > 0 ? `<tr class="ph-even"><td>${(r.opsFees*100).toFixed(2)}%</td><td>${fmtN(s.opsAmt)}</td><td></td><td></td><td>مصاريف تتطوير</td><td>${r.maintDate}</td></tr>` : ''}
+    ${s.maint2Amt > 0 ? `<tr class="ph-even"><td>${(r.maint2*100).toFixed(2)}%</td><td>${fmtN(s.maint2Amt)}</td><td></td><td></td><td>القسط الثاني</td><td>${r.maintDate2}</td></tr>` : ''}
+    ${r.opsFees > 0 ? `<tr class="${s.maint2Amt > 0 ? '' : 'ph-even'}"><td>${(r.opsFees*100).toFixed(2)}%</td><td>${fmtN(s.opsAmt)}</td><td></td><td></td><td>مصاريف تطوير</td><td>${r.maintDate}</td></tr>` : ''}
   </tbody>
 </table>
 <div class="ph-sig"><span>طرف اول</span><span>طرف ثاني</span></div>
@@ -672,7 +674,8 @@ function exportExcel() {
   if (s.isStoda) { ws.push(['مصاريف تامين']); ws.push(['النسبة','القسط','البنك','رقم الشيك','الوصف','التاريخ']); ws.push([(d.r.adminFees*100).toFixed(2)+'%', d.adminAmt, '', '', 'مصاريف اداريه', d.r.adminFeesDate || d.r.dp2d]); ws.push([]); }
   ws.push(['وديعة الصيانة']); ws.push(['النسبة','القسط','البنك','رقم الشيك','الوصف','التاريخ']);
   ws.push([(d.r.maint*100).toFixed(2)+'%', s.maintAmt, '', '', 'القسط الأول', d.r.maintDate]);
-  if (d.r.opsFees > 0) ws.push([(d.r.opsFees*100).toFixed(2)+'%', s.opsAmt, '', '', 'مصاريف تتطوير', d.r.maintDate]);
+  if (s.maint2Amt > 0) ws.push([(d.r.maint2*100).toFixed(2)+'%', s.maint2Amt, '', '', 'القسط الثاني', d.r.maintDate2]);
+  if (d.r.opsFees > 0) ws.push([(d.r.opsFees*100).toFixed(2)+'%', s.opsAmt, '', '', 'مصاريف تطوير', d.r.maintDate]);
   ws.push([]); ws.push(['طرف اول', '', '', '', 'طرف ثاني']);
   const sheet = XLSX.utils.aoa_to_sheet(ws);
   sheet['!cols'] = [{wch:12},{wch:16},{wch:14},{wch:14},{wch:14},{wch:14},{wch:8}];

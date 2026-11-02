@@ -491,7 +491,8 @@ function buildSchedule(d) {
     for (let i = 1; i <= insN; i++) {
       const a = i === insN ? lastAmt : insAmt;
       const insOffset = (r.dp2 === 0) ? i - 1 : i;
-      rows.push({ desc: `INS-${i}`, pct: fmtP(a, base), amt: a, date: addQtrs(r.dp2d || r.dp1d, insOffset), active: true });
+      const insBase = (r.dp2 === 0 || !r.dp2d || r.dp2d === 'NA') ? r.dp1d : r.dp2d;
+      rows.push({ desc: `INS-${i}`, pct: fmtP(a, base), amt: a, date: addQtrs(insBase, insOffset), active: true });
     }
   }
   return { rows, maintAmt, opsAmt, base, isStoda, adminAmt, r, systemPrice };

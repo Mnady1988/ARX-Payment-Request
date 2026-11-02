@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARX Development — Payment Request</title>
+<title>ARX Development — Payment Request v2</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
@@ -604,7 +604,7 @@ function buildPdfHtml(d) {
   <div class="ph-info-row ph-info-row-3">
     <div class="ph-info-cell"><span class="ph-info-lbl">رقم الوحدة :</span><span class="ph-info-val"></span></div>
     <div class="ph-info-cell"><span class="ph-info-lbl">مساحة الوحدة :</span><span class="ph-info-val"></span></div>
-    <div class="ph-info-cell"><span class="ph-info-lbl">وديعة الصيانة :</span><span class="ph-info-val">${fmtN(s.maintAmt + s.maint2Amt)}</span></div>
+    <div class="ph-info-cell"><span class="ph-info-lbl">وديعة الصيانة :</span><span class="ph-info-val">${fmtN(s.maintAmt + (s.maint2Amt||0))}</span></div>
   </div>
   <div class="ph-info-row ph-info-row-3">
     <div class="ph-info-cell"><span class="ph-info-lbl">نوع الوحدة :</span><span class="ph-info-val"></span></div>
@@ -629,7 +629,8 @@ ${adminBlock}
   <tbody>
     <tr><td>${(r.maint*100).toFixed(2)}%</td><td>${fmtN(s.maintAmt)}</td><td></td><td></td><td>القسط الأول</td><td>${r.maintDate}</td></tr>
     ${s.maint2Amt > 0 ? `<tr class="ph-even"><td>${(r.maint2*100).toFixed(2)}%</td><td>${fmtN(s.maint2Amt)}</td><td></td><td></td><td>القسط الثاني</td><td>${r.maintDate2}</td></tr>` : ''}
-    ${r.opsFees > 0 ? `<tr class="${s.maint2Amt > 0 ? '' : 'ph-even'}"><td>${(r.opsFees*100).toFixed(2)}%</td><td>${fmtN(s.opsAmt)}</td><td></td><td></td><td>مصاريف تطوير</td><td>${r.maintDate}</td></tr>` : ''}
+    ${r.opsFees > 0 ? `<tr class="ph-even"><td>${(r.opsFees*100).toFixed(2)}%</td><td>${fmtN(s.opsAmt)}</td><td></td><td></td><td>مصاريف تطوير</td><td>${r.maintDate}</td></tr>` : ''}
+    <tr class="ph-tot"><td>${((r.maint + (r.maint2||0) + r.opsFees)*100).toFixed(2)}%</td><td>${fmtN(s.maintAmt + (s.maint2Amt||0) + s.opsAmt)}</td><td></td><td></td><td>الإجمالي</td><td></td></tr>
   </tbody>
 </table>
 <div class="ph-sig"><span>طرف اول</span><span>طرف ثاني</span></div>

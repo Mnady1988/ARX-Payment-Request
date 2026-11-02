@@ -265,6 +265,7 @@ async function loadSheet() {
       SHEET.push({
         p:          project,
         t:          type,
+        launch:     parsePct(r[2]),          // Launch Offer % (col C)
         dis:        parsePct(r[3]) * 100,   // store as number e.g. 8.25
         insN:       parseInt(r[4]) || 0,
         maint:      parsePct(r[5]),          // Maint-1%
@@ -388,9 +389,9 @@ function loadFallback() {
     {p:"WestDays",t:"8Years - 2.5% Offer",dis:8.25,insN:31,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
     {p:"WestDays",t:"6Years - 2.5% Offer",dis:16.25,insN:23,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
     // Assl New Cairo (Active)
-    {p:"Assl New Cairo",t:"10Years - Standard",dis:0,insN:39,maint:0.05,maintDate:"02-Nov-29",opsFees:0,dp1:0.10,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
-    {p:"Assl New Cairo",t:"8Years - Standard",dis:8.50,insN:31,maint:0.05,maintDate:"02-Nov-29",opsFees:0,dp1:0.10,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
-    {p:"Assl New Cairo",t:"6Years - Standard",dis:17,insN:23,maint:0.05,maintDate:"02-Nov-29",opsFees:0,dp1:0.10,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
+    {p:"Assl New Cairo",t:"10Years - Standard",launch:0.05,dis:0,insN:40,maint:0.05,maintDate:"02-Nov-29",opsFees:0,dp1:0.10,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insDate:"2-Feb-2027",insPct:0.0225,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
+    {p:"Assl New Cairo",t:"8Years - Standard",launch:0.05,dis:8.50,insN:32,maint:0.05,maintDate:"02-Nov-29",opsFees:0,dp1:0.10,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insDate:"2-Feb-2027",insPct:0.0281,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
+    {p:"Assl New Cairo",t:"6Years - Standard",launch:0.05,dis:17,insN:24,maint:0.05,maintDate:"02-Nov-29",opsFees:0,dp1:0.10,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insDate:"2-Feb-2027",insPct:0.0375,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
   ];
   const projects = [...new Set(SHEET.map(r => r.p))];
   const selP = document.getElementById('project');
@@ -420,9 +421,14 @@ function onPaymentChange() {
   const p = document.getElementById('project').value, t = document.getElementById('payment').value;
   CR = SHEET.find(r => r.p === p && r.t === t) || null;
   const badge = document.getElementById('badge');
-  if (CR && CR.dis !== 0) {
-    badge.textContent = CR.dis > 0 ? `${CR.dis}% discount` : `${Math.abs(CR.dis)}% premium`;
-    badge.className = CR.dis > 0 ? 'disc' : 'prem';
+  const totalDis = CR ? (CR.launch * 100 + CR.dis) : 0;
+  if (CR && (CR.launch > 0 || CR.dis !== 0)) {
+    const parts = [];
+    if (CR.launch > 0) parts.push(`${(CR.launch*100).toFixed(2)}% launch`);
+    if (CR.dis > 0) parts.push(`${CR.dis}% discount`);
+    else if (CR.dis < 0) parts.push(`${Math.abs(CR.dis)}% premium`);
+    badge.textContent = parts.join(' + ');
+    badge.className = CR.dis >= 0 ? 'disc' : 'prem';
     badge.style.display = 'inline';
   } else { badge.style.display = 'none'; }
   document.getElementById('stoda-extra').classList.toggle('show', !!(CR && CR.adminFees > 0));
@@ -436,7 +442,9 @@ function fmtN(n) { return n.toLocaleString('en-US', { minimumFractionDigits: 2, 
 function updatePrices() {
   const pr = parseFloat(document.getElementById('price').value);
   if (!isNaN(pr) && CR) {
-    const s = pr * (1 - CR.dis / 100);
+    // Apply Launch Offer first, then Dis/intr on the result
+    const afterLaunch = pr * (1 - (CR.launch || 0));
+    const s = afterLaunch * (1 - CR.dis / 100);
     document.getElementById('selling').value = s.toFixed(2);
     if (CR.adminFees > 0) {
       const a = Math.round((s * CR.adminFees) + Number.EPSILON), st = Math.round(s - a);
@@ -475,7 +483,7 @@ function getOrderData() {
   if (!p || !t || isNaN(pr) || pr <= 0) return null;
   const r = CR;
   const adminAmt = r.adminFees > 0 ? Math.round(sp * r.adminFees) : 0;
-  const sellingRounded = Math.round(pr * (1 - r.dis / 100));
+  const sellingRounded = Math.round(pr * (1 - (r.launch || 0)) * (1 - r.dis / 100));
   const schedTotal = sellingRounded - adminAmt;
   return { project: p, type: t, systemPrice: pr, sellingPrice: sp, adminAmt, schedTotal, r };
 }

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="ltr">
 <head>
 <meta charset="UTF-8">
@@ -12,8 +12,8 @@
 body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:48px 16px;color:var(--text);}
 .container{width:100%;max-width:540px;}
 .logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;}
-.logo-img{height:44px;width:auto;display:block;}
-
+.logo-mark{width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.logo-mark span{color:var(--gold);font-size:11px;font-weight:600;letter-spacing:.04em;line-height:1.2;text-align:center;}
 .logo-text{font-size:14px;font-weight:500;letter-spacing:.02em;}
 .logo-sub{font-size:12px;color:var(--text-3);}
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
@@ -78,22 +78,19 @@ input[readonly]{background:#f9f8f6;color:var(--text-2);cursor:default;}
 .ph-info-cell:last-child{border-left:none;}
 .ph-info-lbl{font-size:8px;color:#555;white-space:nowrap;font-weight:bold;}
 .ph-info-val{font-size:9px;font-weight:bold;color:#000;flex:1;border-bottom:0.5px solid #ccc;min-height:12px;}
-.ph-table,.ph-sub{width:100%;border-collapse:collapse;font-size:8.5px;table-layout:fixed;}
-.ph-table th,.ph-sub th{background:#d9d9d9;padding:2px 3px;text-align:center;font-weight:bold;border:0.5px solid #999;}
-.ph-table td,.ph-sub td{padding:1.5px 3px;border:0.5px solid #ccc;text-align:center;}
+.ph-table,.ph-sub{width:100%;border-collapse:collapse;font-size:9px;table-layout:fixed;}
+.ph-table th,.ph-sub th{background:#d9d9d9;padding:3px 4px;text-align:center;font-weight:bold;border:0.5px solid #999;}
+.ph-table td,.ph-sub td{padding:2px 4px;border:0.5px solid #ccc;text-align:center;}
 .ph-even td{background:#f8f8f8;}
 .ph-tot td{background:#d9d9d9;font-weight:bold;}
 .ph-yc{background:#f2f2f2;font-weight:bold;vertical-align:middle;}
-.ph-gap{height:3px;}
-.ph-info-cell{display:flex;align-items:center;gap:5px;padding:3px 6px;border-left:0.5px solid #999;}
-.ph-info-val{font-size:8.5px;font-weight:bold;color:#000;flex:1;border-bottom:0.5px solid #ccc;min-height:10px;}
-.ph-sig{display:flex;justify-content:space-between;direction:rtl;padding-top:6px;font-size:9.5px;font-weight:bold;}
+.ph-gap{height:5px;}
+.ph-sig{display:flex;justify-content:space-between;padding-top:8px;font-size:10px;font-weight:bold;}
 #print-area{display:none;}
 @media print{
-  @page{size:A4 portrait;margin:5mm 7mm;}
+  @page{size:A4 portrait;margin:7mm 8mm;}
   body>*{display:none!important;}
   #print-area{display:block!important;}
-  .ph-wrap{zoom:0.9;}
   .ph-header,.ph-table th,.ph-sub th,.ph-even td,.ph-tot td,.ph-yc{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 }
 </style>
@@ -101,10 +98,10 @@ input[readonly]{background:#f9f8f6;color:var(--text-2);cursor:default;}
 <body>
 <div class="container">
   <div class="logo">
-    <img class="logo-img" src="data:image/jpeg;base64,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" alt="IL CAZAR">
+    <div class="logo-mark"><span>IL<br>CAZ</span></div>
     <div>
       <div class="logo-text">IL CAZAR</div>
-      <div class="logo-sub">Payment Club</div>
+      <div class="logo-sub">Payment Request</div>
     </div>
   </div>
   <div class="card">
@@ -129,7 +126,7 @@ input[readonly]{background:#f9f8f6;color:var(--text-2);cursor:default;}
       </div>
       <div class="stoda-fields" id="stoda-extra">
         <div class="field">
-          <label>Admin fees <span style="font-size:11px;color:var(--text-3);">(of selling price)</span></label>
+          <label>Admin fees <span style="font-size:11px;color:var(--text-3);">(0.99% of system price)</span></label>
           <div class="input-wrap"><span class="prefix">$</span><input type="text" id="admin-val" readonly/></div>
         </div>
         <div class="field">
@@ -180,37 +177,26 @@ input[readonly]{background:#f9f8f6;color:var(--text-2);cursor:default;}
 <script>
 // ── CONFIG ──
 const SHEET_ID = '1kRm4fxslYSdICl0YLkjF-miWzthlnCBwvMEUDbIVC4A';
-const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&sheet=Master%20Data`;
+const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&sheet=Project%20Payments`;
 
 let SHEET = [];
 let CR = null;
 
 // ── PARSE % value from string like "8.25%" or "0.0825" ──
 function parsePct(s) {
-  if (!s || s === 'NA') return 0;
+  if (!s) return 0;
   s = s.trim();
   if (s.endsWith('%')) return parseFloat(s) / 100;
   return parseFloat(s) || 0;
 }
 
 // ── DETERMINE yearFrom based on project/type ──
-function getYearFrom(project, type, dp2, dp3) {
+function getYearFrom(project, type, dp2) {
   if (project === 'Stoda' && type === '1 Year') return 'DP-1';
   if (project === 'Stoda') return 'INS-1';
   if (project.startsWith('Creek')) return 'INS-1';
-  if (project.startsWith('Park Sight')) return 'INS-1';
-  if (dp3 && dp3 > 0) return 'INS-1';
   if (!dp2 || dp2 === 0) return 'DP-1';
   return 'DP-2';
-}
-
-// ── PROJECT LIST (Park Sight pinned first) ──
-const PINNED_PROJECTS = ['Park Sight - Standard', 'Park Sight - Bullet'];
-function buildProjectList() {
-  const all = [...new Set(SHEET.map(r => r.p))];
-  const pinned = PINNED_PROJECTS.filter(p => all.includes(p));
-  const rest   = all.filter(p => !PINNED_PROJECTS.includes(p));
-  return [...pinned, ...rest];
 }
 
 // ── LOAD SHEET DATA ──
@@ -234,48 +220,52 @@ async function loadSheet() {
       if (!r[0] || !r[1] || r[0].trim() === '') break; // stop at empty project
       const project = r[0].trim();
       const type    = r[1].trim();
-      const status  = r[22] ? r[22].trim().toLowerCase() : '';
       if (!project || !type) continue;
-      if (status !== 'active') continue; // skip In-Active rows
 
-      const dp2v = parsePct(r[8]), dp3v = parsePct(r[9]);
+      // Skip In-Active rows (column 25)
+      const activeFlag = r[25] ? r[25].trim() : '';
+      if (activeFlag === 'In-Active') continue;
+
       SHEET.push({
-        p:             project,
-        t:             type,
-        dis:           parsePct(r[2]) * 100,
-        insN:          parseInt(r[3]) || 0,
-        maint:         parsePct(r[4]),
-        maintDate:     r[5]  && r[5].trim()  !== 'NA' ? r[5].trim()  : '',
-        opsFees:       parsePct(r[6]),
-        dp1:           parsePct(r[7]),
-        dp2:           dp2v,
-        dp3:           dp3v,
-        dp4:           parsePct(r[10]),
-        dp1d:          r[11] && r[11].trim() !== 'NA' ? r[11].trim() : '',
-        dp2d:          r[12] && r[12].trim() !== 'NA' ? r[12].trim() : '',
-        dp3d:          r[13] && r[13].trim() !== 'NA' ? r[13].trim() : '',
-        dp4d:          r[14] && r[14].trim() !== 'NA' ? r[14].trim() : '',
-        bulletN:       parseInt(r[15]) || 0,
-        bulletPct:     parsePct(r[16]),
-        insPct:        parsePct(r[18]),
-        firstInsDate:  r[19] && r[19].trim() !== 'NA' ? r[19].trim() : '',
-        adminFees:     parsePct(r[20]),
-        adminFeesDate: r[21] && r[21].trim() !== 'NA' ? r[21].trim() : '',
-        yearFrom:      getYearFrom(project, type, dp2v, dp3v),
+        p:          project,
+        t:          type,
+        dis:        parsePct(r[3]) * 100,   // store as number e.g. 8.25
+        insN:       parseInt(r[4]) || 0,
+        maint:      parsePct(r[5]),          // Maint-1%
+        maint2:     parsePct(r[6]),          // Maint-2%
+        maintDate:  r[7] ? r[7].trim() : '', // Maint date
+        maintDate2: r[8] ? r[8].trim() : '', // Maint date-2
+        opsFees:    parsePct(r[9]),          // OPS Fees
+        dp1:        parsePct(r[10]),         // DP-1
+        dp2:        parsePct(r[11]),         // DP-2
+        dp3:        parsePct(r[12]),         // DP-3
+        dp4:        parsePct(r[13]),         // DP-4
+        dp1d:       r[14] ? r[14].trim() : '', // DP date
+        dp2d:       r[15] ? r[15].trim() : '', // DP-2 date
+        dp3d:       r[16] ? r[16].trim() : '', // DP-3 date
+        dp4d:       r[17] ? r[17].trim() : '', // DP-4 date
+        bulletN:    parseInt(r[18]) || 0,    // Bullet#
+        bulletPct:  parsePct(r[19]),         // Bullet%
+        reIns:      parsePct(r[20]),         // Re-ins%
+        insPct:     parsePct(r[21]),         // ins%
+        insDate:    r[22] ? r[22].trim() : '', // 1st ins date
+        adminFees:  parsePct(r[23]),         // admin fees
+        adminFeesDate: r[24] ? r[24].trim() : '', // admin fees date
+        yearFrom:   getYearFrom(project, type, parsePct(r[11])),
       });
     }
 
     if (SHEET.length === 0) throw new Error('No data found');
 
-    // Populate project dropdown (Park Sight pinned to top)
-    const projects = buildProjectList();
+    // Populate project dropdown
+    const projects = [...new Set(SHEET.map(r => r.p))];
     const selP = document.getElementById('project');
     selP.innerHTML = '<option value="" disabled selected>Select a project</option>';
     projects.forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; selP.appendChild(o); });
     selP.disabled = false;
     document.getElementById('confirm-btn').disabled = false;
 
-    statusEl.innerHTML = `<div class="status-msg" style="color:var(--success);">✓ Data loaded — ${SHEET.length} active plans</div>`;
+    statusEl.innerHTML = `<div class="status-msg" style="color:var(--success);">✓ Data loaded — ${SHEET.length} payment plans</div>`;
     setTimeout(() => statusEl.innerHTML = '', 3000);
 
   } catch (err) {
@@ -286,51 +276,87 @@ async function loadSheet() {
 
 // ── FALLBACK DATA (last known good) ──
 function loadFallback() {
-  const S=(p,t,dis,insN,maint,maintDate,opsFees,dp1,dp2,dp3,dp4,dp1d,dp2d,dp3d,dp4d,bulletN,bulletPct,insPct,firstInsDate,adminFees,adminFeesDate,yearFrom)=>
-    ({p,t,dis,insN,maint,maintDate,opsFees,dp1,dp2,dp3,dp4,dp1d,dp2d,dp3d,dp4d,bulletN,bulletPct,insPct,firstInsDate,adminFees,adminFeesDate,yearFrom});
-  //                          p                              t          dis    insN maint  maintDate    ops   dp1    dp2     dp3    dp4    dp1d         dp2d         dp3d         dp4d         bN bPct  insPct  firstInsDate   adminFees    adminFeesDate  yearFrom
+  // Fallback: all projects from sheet (all currently In-Active in sheet, shown as cached data)
   SHEET = [
-    S("Stoda","10 Years",      0,    40, 0.08,"01-Dec-26",0.02, 0.10,  0.0501,0,   0,    "18-Jun-26","18-Aug-26","",          "",          0,0,     0.0210,"18-Nov-26",  0.0099009901,"18-Aug-26","INS-1"),
-    S("Stoda","7 Years",      10,    28, 0.08,"01-Dec-26",0.02, 0.10,  0.0501,0,   0,    "18-Jun-26","18-Aug-26","",          "",          0,0,     0.0300,"18-Nov-26",  0.0099009901,"18-Aug-26","INS-1"),
-    S("Stoda","6 Years",      15,    24, 0.08,"01-Dec-26",0.02, 0.10,  0.0501,0,   0,    "18-Jun-26","18-Aug-26","",          "",          0,0,     0.0350,"18-Nov-26",  0.0099009901,"18-Aug-26","INS-1"),
-    S("Stoda","1 Year",       30,     3, 0.08,"01-Dec-26",0.02, 0.25,  0,     0,   0,    "18-Jun-26","",          "",          "",          0,0,     0.2500,"18-Sep-26",  0.0099009901,"18-Jun-26","DP-1"),
-    S("The Crest - Apartments","8 Years",  8.25, 31, 0.08,"01-Dec-29",0, 0.05, 0.05,0,   0,    "18-Jun-26","18-Sep-26","",          "",          0,0,     0.0290,"18-Dec-26",  0,           "",        "DP-2"),
-    S("The Crest - Apartments","10 Years", 0,    39, 0.08,"01-Dec-29",0, 0.05, 0.05,0,   0,    "18-Jun-26","18-Sep-26","",          "",          0,0,     0.0231,"18-Dec-26",  0,           "",        "DP-2"),
-    S("The Crest - Apartments","6 Years",  16.25,23, 0.08,"01-Dec-29",0, 0.05, 0.05,0,   0,    "18-Jun-26","18-Sep-26","",          "",          0,0,     0.0391,"18-Dec-26",  0,           "",        "DP-2"),
-    S("The Crest - Apartments","Cash",     35,    1, 0.08,"01-Dec-29",0, 1.00, 0,   0,   0,    "18-Jun-26","",          "",          "",          0,0,     0,     "",            0,           "",        "DP-1"),
-    S("The Crest - Villas 4Y Delivery","8 Years",  8.25, 31, 0.08,"01-Dec-29",0, 0.05, 0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0290,"18-Dec-26",0,"","DP-2"),
-    S("The Crest - Villas 4Y Delivery","10 Years", 0,    39, 0.08,"01-Dec-29",0, 0.05, 0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0231,"18-Dec-26",0,"","DP-2"),
-    S("The Crest - Villas 4Y Delivery","6 Years",  16.25,23, 0.08,"01-Dec-29",0, 0.05, 0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0391,"18-Dec-26",0,"","DP-2"),
-    S("The Crest - Villas 4Y Delivery","Cash",     35,    1, 0.08,"01-Dec-29",0, 1.00, 0,   0,0,"18-Jun-26","",         "","",0,0,0,     "",         0,"","DP-1"),
-    S("The Crest - Villas 2Y Delivery","8 Years",  8.25, 31, 0.08,"01-Dec-27",0, 0.05, 0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0290,"18-Dec-26",0,"","DP-2"),
-    S("The Crest - Villas 2Y Delivery","10 Years", 0,    39, 0.08,"01-Dec-27",0, 0.05, 0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0231,"18-Dec-26",0,"","DP-2"),
-    S("The Crest - Villas 2Y Delivery","6 Years",  16.25,23, 0.08,"01-Dec-27",0, 0.05, 0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0391,"18-Dec-26",0,"","DP-2"),
-    S("The Crest - Villas 2Y Delivery","Cash",     35,    1, 0.08,"01-Dec-27",0, 1.00, 0,   0,0,"18-Jun-26","",         "","",0,0,0,     "",         0,"","DP-1"),
-    S("WestDays","8 Years",  8.25, 31, 0.08,"01-Dec-29",0, 0.05,0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0290,"18-Dec-26",0,"","DP-2"),
-    S("WestDays","10 Years", 0,    39, 0.08,"01-Dec-29",0, 0.05,0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0231,"18-Dec-26",0,"","DP-2"),
-    S("WestDays","6 Years",  16.25,23, 0.08,"01-Dec-29",0, 0.05,0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0391,"18-Dec-26",0,"","DP-2"),
-    S("WestDays","Cash",     35,    1, 0.08,"01-Dec-29",0, 1.00,0,   0,0,"18-Jun-26","",          "","",0,0,0,     "",         0,"","DP-1"),
-    S("Creek Town","8 Years",       0,    32, 0.10,"18-Jun-26",0,    0.10,0,0,0,"18-Jun-26","",          "","",0,0,0.0281,"18-Sep-26",  0,           "",        "INS-1"),
-    S("Creek Town A.S","10 Years",  0,    40, 0.08,"18-Jun-26",0.02, 0.10,0,0,0,"18-Jun-26","",          "","",0,0,0.0225,"18-Sep-26",  0.0099009901,"18-Jun-26","INS-1"),
-    S("Creek Town A.S","8 Years",  10,    32, 0.08,"18-Jun-26",0.02, 0.10,0,0,0,"18-Jun-26","",          "","",0,0,0.0281,"18-Sep-26",  0.0099009901,"18-Jun-26","INS-1"),
-    S("Glen","8 Years",  8.25, 31, 0.08,"01-Jun-29",0, 0.05,0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0290,"18-Dec-26",0,"","DP-2"),
-    S("Glen","10 Years", 0,    39, 0.08,"01-Jun-29",0, 0.05,0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0231,"18-Dec-26",0,"","DP-2"),
-    S("Glen","6 Years",  16.25,23, 0.08,"01-Jun-29",0, 0.05,0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0391,"18-Dec-26",0,"","DP-2"),
-    S("Go Heliopolis","5 Years",0,  20, 0.10,"18-Jun-26",0, 0.10,0,0,0,"18-Jun-26","","","",0,0,0.0450,"18-Sep-26",0,"","INS-1"),
-    S("Safia","8 Years",  8.25, 31, 0.10,"01-Dec-29",0, 0.05,0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0290,"18-Dec-26",0,"","DP-2"),
-    S("Safia","10 Years", 0,    39, 0.10,"01-Dec-29",0, 0.05,0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0231,"18-Dec-26",0,"","DP-2"),
-    S("Safia","6 Years",  16.25,23, 0.10,"01-Dec-29",0, 0.05,0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0391,"18-Dec-26",0,"","DP-2"),
-    S("The C","8 Years",  8.25, 31, 0.10,"01-Dec-29",0, 0.05,0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0290,"18-Dec-26",0,"","DP-2"),
-    S("The C","10 Years", 0,    39, 0.10,"01-Dec-29",0, 0.05,0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0231,"18-Dec-26",0,"","DP-2"),
-    S("The C","6 Years",  16.25,23, 0.10,"01-Dec-29",0, 0.05,0.05,0,0,"18-Jun-26","18-Sep-26","","",0,0,0.0391,"18-Dec-26",0,"","DP-2"),
-    S("Park Sight - Standard","10 Years",0,    39,0.10,"01-Jun-29",0,0.025,0.025,0.025,0.025,"18-Jun-26","18-Jul-26","18-Sep-26","18-Oct-26",0,0,     0.0231,"18-Jan-27",0,"","INS-1"),
-    S("Park Sight - Standard","8 Years", 8.25, 31,0.10,"01-Jun-29",0,0.025,0.025,0.025,0.025,"18-Jun-26","18-Jul-26","18-Sep-26","18-Oct-26",0,0,     0.0290,"18-Jan-27",0,"","INS-1"),
-    S("Park Sight - Standard","6 Years", 16.25,23,0.10,"01-Jun-29",0,0.025,0.025,0.025,0.025,"18-Jun-26","18-Jul-26","18-Sep-26","18-Oct-26",0,0,     0.0391,"18-Jan-27",0,"","INS-1"),
-    S("Park Sight - Bullet","10 Years",0,    30,0.10,"01-Jun-29",0,0.025,0.025,0.025,0.025,"18-Jun-26","18-Jul-26","18-Sep-26","18-Oct-26",9,0.0500,0.0150,"18-Jan-27",0,"","INS-1"),
-    S("Park Sight - Bullet","8 Years", 8.25, 24,0.10,"01-Jun-29",0,0.025,0.025,0.025,0.025,"18-Jun-26","18-Jul-26","18-Sep-26","18-Oct-26",7,0.0771,0.0150,"18-Jan-27",0,"","INS-1"),
-    S("Park Sight - Bullet","6 Years", 16.25,18,0.10,"01-Jun-29",0,0.025,0.025,0.025,0.025,"18-Jun-26","18-Jul-26","18-Sep-26","18-Oct-26",5,0.1260,0.0150,"18-Jan-27",0,"","INS-1"),
+    // Creek Town
+    {p:"Creek Town",t:"8Years",dis:0,insN:32,maint:0.10,maintDate:"02-Nov-26",opsFees:0,dp1:0.10,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0.0281,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
+    {p:"Creek Town",t:"Type K",dis:0,insN:19,maint:0.10,maintDate:"02-Nov-26",opsFees:0,dp1:0.10,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0447,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    // Creek Town A.S
+    {p:"Creek Town A.S",t:"10Years - Standard",dis:0,insN:40,maint:0.08,maintDate:"02-Nov-26",opsFees:0.02,dp1:0.10,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0.0225,adminFees:0.0099009901,adminFeesDate:"02-Nov-26",yearFrom:"INS-1"},
+    {p:"Creek Town A.S",t:"8Years - Standard",dis:10,insN:32,maint:0.08,maintDate:"02-Nov-26",opsFees:0.02,dp1:0.10,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0.0281,adminFees:0.0099009901,adminFeesDate:"02-Nov-26",yearFrom:"INS-1"},
+    // Glen
+    {p:"Glen",t:"8Years - Standard",dis:8.25,insN:31,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Glen",t:"10Years - Standard",dis:0,insN:39,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Glen",t:"6Years - Standard",dis:16.25,insN:23,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Glen",t:"Cash",dis:31.50,insN:0,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:1.00,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
+    {p:"Glen",t:"10Years - 2.5% Offer",dis:0,insN:39,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Glen",t:"8Years - 2.5% Offer",dis:8.25,insN:31,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Glen",t:"6Years - 2.5% Offer",dis:16.25,insN:23,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    // Park Sight
+    {p:"Park Sight",t:"10Years - Standard",dis:0,insN:39,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Park Sight",t:"8Years - Standard",dis:8.25,insN:31,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Park Sight",t:"6Years - Standard",dis:16.25,insN:23,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Park Sight",t:"Cash",dis:31.50,insN:0,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:1.00,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
+    // Safia
+    {p:"Safia",t:"10Years - Standard",dis:0,insN:39,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Safia",t:"8Years - Standard",dis:8.25,insN:31,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Safia",t:"6Years - Standard",dis:16.25,insN:23,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Safia",t:"10Years - 2.5% Offer",dis:0,insN:39,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Safia",t:"8Years - 2.5% Offer",dis:8.25,insN:31,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Safia",t:"6Years - 2.5% Offer",dis:16.25,insN:23,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    // Stoda
+    {p:"Stoda",t:"10Years",dis:0,insN:40,maint:0.08,maintDate:"02-May-27",opsFees:0.02,dp1:0.10,dp2:0.0501,dp1d:"02-Nov-26",dp2d:"02-Jan-27",insPct:0.0210,adminFees:0.0099009901,adminFeesDate:"02-Jan-27",yearFrom:"INS-1"},
+    {p:"Stoda",t:"7Years",dis:10,insN:28,maint:0.08,maintDate:"02-May-27",opsFees:0.02,dp1:0.10,dp2:0.0501,dp1d:"02-Nov-26",dp2d:"02-Jan-27",insPct:0.0300,adminFees:0.0099009901,adminFeesDate:"02-Jan-27",yearFrom:"INS-1"},
+    {p:"Stoda",t:"6Years",dis:15,insN:24,maint:0.08,maintDate:"02-May-27",opsFees:0.02,dp1:0.10,dp2:0.0501,dp1d:"02-Nov-26",dp2d:"02-Jan-27",insPct:0.0350,adminFees:0.0099009901,adminFeesDate:"02-Jan-27",yearFrom:"INS-1"},
+    {p:"Stoda",t:"1Year",dis:30,insN:3,maint:0.08,maintDate:"02-May-27",opsFees:0.02,dp1:0.25,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0.2500,adminFees:0.0099009901,adminFeesDate:"02-Nov-26",yearFrom:"DP-1"},
+    // C North
+    {p:"C North",t:"8Years - Standard",dis:8.25,insN:31,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"C North",t:"10Years - Standard",dis:0,insN:39,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"C North",t:"6Years - Standard",dis:16.25,insN:23,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"C North",t:"12Years - Standard",dis:-12,insN:47,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0191,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"C North",t:"10Years - 2.5% Offer",dis:0,insN:39,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"C North",t:"8Years - 2.5% Offer",dis:8.25,insN:31,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"C North",t:"6Years - 2.5% Offer",dis:16.25,insN:23,maint:0.10,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    // The Crest - Apartments
+    {p:"The Crest - Apartments",t:"10Years - Standard",dis:0,insN:39,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"The Crest - Apartments",t:"8Years - Standard",dis:8.25,insN:31,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"The Crest - Apartments",t:"6Years - Standard",dis:16.25,insN:23,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"The Crest - Apartments",t:"Cash",dis:31.50,insN:0,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:1.00,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
+    {p:"The Crest - Apartments",t:"10Years - 2.5% Offer",dis:0,insN:39,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"The Crest - Apartments",t:"8Years - 2.5% Offer",dis:8.25,insN:31,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"The Crest - Apartments",t:"6Years - 2.5% Offer",dis:16.25,insN:23,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    // The Crest - Villas 2Y Delivery
+    {p:"The Crest - Villas 2Y Delivery",t:"10Years - Standard",dis:0,insN:39,maint:0.08,maintDate:"02-Nov-27",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"The Crest - Villas 2Y Delivery",t:"8Years - Standard",dis:8.25,insN:31,maint:0.08,maintDate:"02-Nov-27",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"The Crest - Villas 2Y Delivery",t:"6Years - Standard",dis:16.25,insN:23,maint:0.08,maintDate:"02-Nov-27",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"The Crest - Villas 2Y Delivery",t:"Cash",dis:31.50,insN:0,maint:0.08,maintDate:"02-Nov-27",opsFees:0,dp1:1.00,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
+    // The Crest - Villas 4Y Delivery
+    {p:"The Crest - Villas 4Y Delivery",t:"10Years - Standard",dis:0,insN:39,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"The Crest - Villas 4Y Delivery",t:"8Years - Standard",dis:8.25,insN:31,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"The Crest - Villas 4Y Delivery",t:"6Years - Standard",dis:16.25,insN:23,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"The Crest - Villas 4Y Delivery",t:"Cash",dis:31.50,insN:0,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:1.00,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
+    // Vea
+    {p:"Vea",t:"10Years - Standard",dis:0,insN:39,maint:0.08,maintDate:"02-Nov-28",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Vea",t:"8Years - Standard",dis:8.25,insN:31,maint:0.08,maintDate:"02-Nov-28",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Vea",t:"6Years - Standard",dis:16.25,insN:23,maint:0.08,maintDate:"02-Nov-28",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Vea",t:"Cash",dis:31.50,insN:0,maint:0.08,maintDate:"02-Nov-28",opsFees:0,dp1:1.00,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
+    {p:"Vea",t:"10Years - 2.5% Offer",dis:0,insN:39,maint:0.08,maintDate:"02-Nov-28",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Vea",t:"8Years - 2.5% Offer",dis:8.25,insN:31,maint:0.08,maintDate:"02-Nov-28",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"Vea",t:"6Years - 2.5% Offer",dis:16.25,insN:23,maint:0.08,maintDate:"02-Nov-28",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    // WestDays
+    {p:"WestDays",t:"10Years - Standard",dis:0,insN:39,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"WestDays",t:"8Years - Standard",dis:8.25,insN:31,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"WestDays",t:"6Years - Standard",dis:16.25,insN:23,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.05,dp2:0.05,dp1d:"02-Nov-26",dp2d:"02-Feb-27",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"WestDays",t:"Cash",dis:31.50,insN:0,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:1.00,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
+    {p:"WestDays",t:"10Years - 2.5% Offer",dis:0,insN:39,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"WestDays",t:"8Years - 2.5% Offer",dis:8.25,insN:31,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    {p:"WestDays",t:"6Years - 2.5% Offer",dis:16.25,insN:23,maint:0.08,maintDate:"02-Nov-29",opsFees:0,dp1:0.025,dp2:0.025,dp1d:"02-Nov-26",dp2d:"02-Dec-26",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-2"},
+    // Assl New Cairo (Active)
+    {p:"Assl New Cairo",t:"10Years - Standard",dis:0,insN:39,maint:0.05,maintDate:"02-Nov-29",opsFees:0,dp1:0.10,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0.0231,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
+    {p:"Assl New Cairo",t:"8Years - Standard",dis:8.50,insN:31,maint:0.05,maintDate:"02-Nov-29",opsFees:0,dp1:0.10,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0.0290,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
+    {p:"Assl New Cairo",t:"6Years - Standard",dis:17,insN:23,maint:0.05,maintDate:"02-Nov-29",opsFees:0,dp1:0.10,dp2:0,dp1d:"02-Nov-26",dp2d:"NA",insPct:0.0391,adminFees:0,adminFeesDate:"NA",yearFrom:"DP-1"},
   ];
-  const projects = buildProjectList();
+  const projects = [...new Set(SHEET.map(r => r.p))];
   const selP = document.getElementById('project');
   selP.innerHTML = '<option value="" disabled selected>Select a project</option>';
   projects.forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; selP.appendChild(o); });
@@ -369,17 +395,17 @@ function onPaymentChange() {
   updatePrices();
 }
 
-function fmtN(n) { return Math.round(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
+function fmtN(n) { return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
 function updatePrices() {
   const pr = parseFloat(document.getElementById('price').value);
   if (!isNaN(pr) && CR) {
-    const s = Math.round(pr * (1 - CR.dis / 100));
-    document.getElementById('selling').value = s;
+    const s = pr * (1 - CR.dis / 100);
+    document.getElementById('selling').value = s.toFixed(2);
     if (CR.adminFees > 0) {
-      const a = Math.round(s * CR.adminFees), st = s - a;
-      document.getElementById('admin-val').value = a;
-      document.getElementById('sched-val').value = st;
+      const a = Math.round((s * CR.adminFees) + Number.EPSILON), st = Math.round(s - a);
+      document.getElementById('admin-val').value = a.toFixed(2);
+      document.getElementById('sched-val').value = st.toFixed(2);
     }
   } else {
     document.getElementById('selling').value = '';
@@ -428,68 +454,33 @@ function handleConfirm() {
 const MO = { Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12 };
 const MN = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function addQtrs(s, n) {
-  if (!s || s === 'NA') return '';
-  const pts = s.split('-');
-  let d = parseInt(pts[0]), m = MO[pts[1]], y = parseInt(pts[2]);
-  if (y < 100) y += 2000;
+  if (!s) return '';
+  const pts = s.split('-'); let d = parseInt(pts[0]), m = MO[pts[1]], y = 2000 + parseInt(pts[2]);
   m += n * 3; while (m > 12) { m -= 12; y++; }
-  return `${String(d).padStart(2,'0')}-${MN[m]}-${String(y % 100).padStart(2,'0')}`;
+  return `${String(d).padStart(2,'0')}-${MN[m]}-${String(y).slice(-2)}`;
 }
 function fmtP(n, base) { return ((n / base) * 100).toFixed(3) + '%'; }
 
 function buildSchedule(d) {
   const { systemPrice, sellingPrice, adminAmt, schedTotal, r } = d;
   const isStoda = r.adminFees > 0;
-  const base = isStoda ? schedTotal : Math.round(sellingPrice);
-  const dp1Amt    = r.dp1           > 0 ? Math.round(base * r.dp1)            : 0;
-  const dp2Amt    = r.dp2           > 0 ? Math.round(base * r.dp2)            : 0;
-  const dp3Amt    = (r.dp3 || 0)   > 0 ? Math.round(base * r.dp3)            : 0;
-  const dp4Amt    = (r.dp4 || 0)   > 0 ? Math.round(base * r.dp4)            : 0;
-  const allocFixed = dp1Amt + dp2Amt + dp3Amt + dp4Amt;
-  const insN      = r.insN;
-  const bulletN   = r.bulletN || 0;
-  const bulletAmt = bulletN > 0 ? Math.round(base * (r.bulletPct || 0))       : 0;
-  // Distribute remaining balance equally across installments — avoids large rounding error
-  // from using the sheet's rounded insPct percentage directly
-  const insRemaining = base - allocFixed - bulletAmt * bulletN;
-  const insAmt       = insN > 0 && r.insPct > 0 ? Math.floor(insRemaining / insN) : 0;
-  const lastAmt      = insN > 0 && r.insPct > 0 ? insRemaining - insAmt * (insN - 1) : 0;
-  const maintAmt   = Math.round(systemPrice * r.maint);
-  const opsAmt     = r.opsFees > 0 ? Math.round(systemPrice * r.opsFees) : 0;
-
-  // First INS date: explicit from sheet > dp2+3mo > dp2d (when dp2=0) > dp1d
-  let firstInsDate;
-  if (r.firstInsDate && r.firstInsDate !== '') {
-    firstInsDate = r.firstInsDate;
-  } else if (r.dp2 > 0) {
-    firstInsDate = addQtrs(r.dp2d || r.dp1d, 1);
-  } else {
-    firstInsDate = r.dp2d || r.dp1d;
-  }
-
+  const base = isStoda ? schedTotal : sellingPrice;
+  const dp1Amt = Math.round(base * r.dp1);
+  const dp2Amt = Math.round(base * r.dp2);
+  const insAmt = Math.round(base * r.insPct);
+  const insN = r.insN;
+  const allocated = dp1Amt + dp2Amt + insAmt * insN;
+  const lastAmt = insAmt + (Math.round(base) - allocated);
+  const maintAmt = Math.round(systemPrice * r.maint);
+  const opsAmt = r.opsFees > 0 ? Math.round(systemPrice * r.opsFees) : 0;
   const rows = [];
-  if (dp1Amt > 0) rows.push({ desc: 'DP-1', pct: fmtP(dp1Amt, base), amt: dp1Amt, date: r.dp1d });
-  if (dp2Amt > 0) rows.push({ desc: 'DP-2', pct: fmtP(dp2Amt, base), amt: dp2Amt, date: r.dp2d });
-  if (dp3Amt > 0) rows.push({ desc: 'DP-3', pct: fmtP(dp3Amt, base), amt: dp3Amt, date: r.dp3d });
-  if (dp4Amt > 0) rows.push({ desc: 'DP-4', pct: fmtP(dp4Amt, base), amt: dp4Amt, date: r.dp4d });
-
+  rows.push({ desc: 'DP-1', pct: fmtP(dp1Amt, base), amt: dp1Amt, date: r.dp1d, active: true });
+  if (dp2Amt > 0) rows.push({ desc: 'DP-2', pct: fmtP(dp2Amt, base), amt: dp2Amt, date: r.dp2d, active: true });
   if (insN > 0 && r.insPct > 0) {
-    let insCount = 0, bulletCount = 0, payIdx = 0;
-    while (insCount < insN) {
-      // Add up to 3 INS
-      const groupSize = bulletN > 0 ? 3 : insN; // no grouping if no bullets
-      for (let k = 0; k < groupSize && insCount < insN; k++) {
-        insCount++;
-        const a = insCount === insN ? lastAmt : insAmt;
-        rows.push({ desc: `INS-${insCount}`, pct: fmtP(a, base), amt: a, date: addQtrs(firstInsDate, payIdx) });
-        payIdx++;
-      }
-      // Add 1 bullet after each group of 3 INS (while bullets remain)
-      if (bulletN > 0 && bulletCount < bulletN) {
-        bulletCount++;
-        rows.push({ desc: `Bullet-${bulletCount}`, pct: fmtP(bulletAmt, base), amt: bulletAmt, date: addQtrs(firstInsDate, payIdx) });
-        payIdx++;
-      }
+    for (let i = 1; i <= insN; i++) {
+      const a = i === insN ? lastAmt : insAmt;
+      const insOffset = (r.dp2 === 0) ? i - 1 : i;
+      rows.push({ desc: `INS-${i}`, pct: fmtP(a, base), amt: a, date: addQtrs(r.dp2d || r.dp1d, insOffset), active: true });
     }
   }
   return { rows, maintAmt, opsAmt, base, isStoda, adminAmt, r, systemPrice };
@@ -499,9 +490,7 @@ function buildPdfHtml(d) {
   const s = buildSchedule(d);
   const r = d.r;
   const isStoda = s.isStoda;
-  const totalPct = isStoda ? (100 - r.adminFees * 100).toFixed(2) + '%' : '100.00%';
-  // Selling price = system price after discount (computed directly, not from input field)
-  const displaySellingPrice = Math.round(d.systemPrice * (1 - r.dis / 100));
+  const totalPct = isStoda ? '99.01%' : '100.00%';
   const yearFrom = r.yearFrom || 'DP-2';
   // yearStartIdx: index in rows array where year counting starts
   // INS-1 → find INS-1 index; DP-2 → find DP-2 index; DP-1 → 0
@@ -511,10 +500,8 @@ function buildPdfHtml(d) {
     return 0; // DP-1
   })();
 
-  // Year grouping:
-  // • Bullet projects: every 4 rows (3 INS + 1 Bullet) from yearStartIdx = 1 year
-  // • Other projects: every 4 INS rows = 1 year
-  const bulletN = r.bulletN || 0;
+  // insCountFromYearStart: count of INS rows from yearStart onward
+  // Each group of 4 INS rows = 1 year
   let insCountSoFar = 0;
   let schedRows = '';
   s.rows.forEach((row, i) => {
@@ -525,17 +512,9 @@ function buildPdfHtml(d) {
     if (yearStartIdx === -1 || i < yearStartIdx) {
       // before year start — empty cell
       yearCellHtml = '<td></td>';
-    } else if (bulletN > 0) {
-      // Bullet project: every 4 rows from yearStartIdx = 1 year
-      const rowOffset = i - yearStartIdx;
-      if (rowOffset % 4 === 0) {
-        const yr = Math.floor(rowOffset / 4) + 1;
-        const span = Math.min(4, s.rows.length - i);
-        yearCellHtml = `<td class="ph-yc" rowspan="${span}">Year ${yr}</td>`;
-      }
-      // else: covered by rowspan — emit no cell
     } else if (i === yearStartIdx) {
-      // first year label — span 4 INS rows
+      // first year label always here — Year 1
+      // span = 4 INS rows (+ non-INS rows that come before INS-1 if yearFrom=DP-2)
       let span = 0, insInGroup = 0;
       for (let j = i; j < s.rows.length && insInGroup < 4; j++) {
         span++;
@@ -574,12 +553,12 @@ function buildPdfHtml(d) {
   <div class="ph-info-row ph-info-row-3">
     <div class="ph-info-cell"><span class="ph-info-lbl">المشروع :</span><span class="ph-info-val">${d.project}</span></div>
     <div class="ph-info-cell"><span class="ph-info-lbl">المبني :</span><span class="ph-info-val"></span></div>
-    <div class="ph-info-cell"><span class="ph-info-lbl">سعر الوحدة :</span><span class="ph-info-val">${fmtN(displaySellingPrice)}</span></div>
+    <div class="ph-info-cell"><span class="ph-info-lbl">سعر الوحدة :</span><span class="ph-info-val">${fmtN(d.systemPrice)}</span></div>
   </div>
   <div class="ph-info-row ph-info-row-3">
     <div class="ph-info-cell"><span class="ph-info-lbl">رقم الوحدة :</span><span class="ph-info-val"></span></div>
     <div class="ph-info-cell"><span class="ph-info-lbl">مساحة الوحدة :</span><span class="ph-info-val"></span></div>
-    <div class="ph-info-cell"><span class="ph-info-lbl">وديعة الصيانة :</span><span class="ph-info-val">${fmtN(s.maintAmt + s.opsAmt)}</span></div>
+    <div class="ph-info-cell"><span class="ph-info-lbl">وديعة الصيانة :</span><span class="ph-info-val">${fmtN(s.maintAmt)}</span></div>
   </div>
   <div class="ph-info-row ph-info-row-3">
     <div class="ph-info-cell"><span class="ph-info-lbl">نوع الوحدة :</span><span class="ph-info-val"></span></div>
@@ -606,9 +585,7 @@ ${adminBlock}
     ${r.opsFees > 0 ? `<tr class="ph-even"><td>${(r.opsFees*100).toFixed(2)}%</td><td>${fmtN(s.opsAmt)}</td><td></td><td></td><td>مصاريف تتطوير</td><td>${r.maintDate}</td></tr>` : ''}
   </tbody>
 </table>
-${isStoda
-  ? `<div class="ph-sig"><span>طرف اول</span><span>طرف ثاني</span><span>طرف ثالث</span></div>`
-  : `<div class="ph-sig"><span>طرف اول</span><span>طرف ثاني</span></div>`}
+<div class="ph-sig"><span>طرف اول</span><span>طرف ثاني</span></div>
 </div>`;
 }
 
@@ -632,36 +609,15 @@ function exportExcel() {
   ws.push(['Maintenance', '', fmtN(s.maintAmt)]);
   if (s.isStoda) { ws.push(['Admin fees (0.99%)', '', fmtN(d.adminAmt)]); ws.push(['Schedule total', '', fmtN(Math.round(d.schedTotal))]); }
   ws.push([]); ws.push(['النسبة','القسط','البنك','رقم الشيك','الوصف','التاريخ','Year']);
-  // Build year labels using same logic as PDF
   const yearFrom = d.r.yearFrom || 'DP-2';
-  const yrStartIdx = (() => {
-    if (yearFrom === 'INS-1') return s.rows.findIndex(r => r.desc === 'INS-1');
-    if (yearFrom === 'DP-2')  return s.rows.findIndex(r => r.desc === 'DP-2');
-    return 0;
-  })();
-  const yearLabels = new Array(s.rows.length).fill('');
-  const bulletNr = d.r.bulletN || 0;
-  if (bulletNr > 0) {
-    // Bullet project: every 4 rows (3 INS + 1 Bullet) from yrStartIdx = 1 year
-    s.rows.forEach((row, i) => {
-      if (yrStartIdx === -1 || i < yrStartIdx) return;
-      const rowOffset = i - yrStartIdx;
-      if (rowOffset % 4 === 0) yearLabels[i] = `Year ${Math.floor(rowOffset / 4) + 1}`;
-    });
-  } else {
-    let insCount = 0;
-    s.rows.forEach((row, i) => {
-      if (yrStartIdx === -1 || i < yrStartIdx) return;
-      const isIns = row.desc.startsWith('INS-');
-      if (i === yrStartIdx) { yearLabels[i] = 'Year 1'; }
-      else if (isIns && insCount > 0 && insCount % 4 === 0) { yearLabels[i] = `Year ${Math.floor(insCount / 4) + 1}`; }
-      if (isIns) insCount++;
-    });
-  }
-  s.rows.forEach((row, i) => ws.push([row.pct, row.amt, '', '', row.desc, row.date, yearLabels[i]]));
-  const totalPctXl = s.isStoda ? (100 - d.r.adminFees * 100).toFixed(2) + '%' : '100.00%';
-  ws.push([totalPctXl, Math.round(s.base), '', '', 'الإجمالي', '', '']); ws.push([]);
-  if (s.isStoda) { ws.push(['مصاريف تامين']); ws.push(['النسبة','القسط','البنك','رقم الشيك','الوصف','التاريخ']); ws.push([(d.r.adminFees*100).toFixed(4)+'%', d.adminAmt, '', '', 'مصاريف اداريه', d.r.adminFeesDate || d.r.dp1d]); ws.push([]); }
+  const yearStartIdx = yearFrom === 'DP-1' ? 0 : yearFrom === 'DP-2' ? 1 : 2;
+  s.rows.forEach((row, i) => {
+    const pos = i - yearStartIdx;
+    const yr = pos >= 0 ? `Year ${Math.floor(pos / 4) + 1}` : '';
+    ws.push([row.pct, row.amt, '', '', row.desc, row.date, yr]);
+  });
+  ws.push([s.isStoda ? '99.01%' : '100.00%', Math.round(s.base), '', '', 'الإجمالي', '', '']); ws.push([]);
+  if (s.isStoda) { ws.push(['مصاريف تامين']); ws.push(['النسبة','القسط','البنك','رقم الشيك','الوصف','التاريخ']); ws.push([(d.r.adminFees*100).toFixed(2)+'%', d.adminAmt, '', '', 'مصاريف اداريه', d.r.adminFeesDate || d.r.dp2d]); ws.push([]); }
   ws.push(['وديعة الصيانة']); ws.push(['النسبة','القسط','البنك','رقم الشيك','الوصف','التاريخ']);
   ws.push([(d.r.maint*100).toFixed(2)+'%', s.maintAmt, '', '', 'القسط الأول', d.r.maintDate]);
   if (d.r.opsFees > 0) ws.push([(d.r.opsFees*100).toFixed(2)+'%', s.opsAmt, '', '', 'مصاريف تتطوير', d.r.maintDate]);

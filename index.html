@@ -553,8 +553,8 @@ function buildPdfHtml(d) {
     return 0; // DP-1
   })();
 
-  // insCountFromYearStart: count of INS rows from yearStart onward
-  // Each group of 4 INS rows = 1 year
+  // Year column: always starts from INS-1, groups of 4 quarters = 1 year
+  const ins1Idx = s.rows.findIndex(r => r.desc === 'INS-1');
   let insCountSoFar = 0;
   let schedRows = '';
   s.rows.forEach((row, i) => {
@@ -562,31 +562,24 @@ function buildPdfHtml(d) {
     const isIns = row.desc.startsWith('INS-');
     let yearCellHtml = '';
 
-    if (yearStartIdx === -1 || i < yearStartIdx) {
-      // before year start — empty cell
+    if (ins1Idx === -1 || i < ins1Idx) {
+      // DP rows before INS-1 — no year cell
       yearCellHtml = '<td></td>';
-    } else if (i === yearStartIdx) {
-      // first year label always here — Year 1
-      // span = 4 INS rows (+ non-INS rows that come before INS-1 if yearFrom=DP-2)
-      let span = 0, insInGroup = 0;
-      for (let j = i; j < s.rows.length && insInGroup < 4; j++) {
-        span++;
-        if (s.rows[j].desc.startsWith('INS-')) insInGroup++;
-      }
-      yearCellHtml = `<td class="ph-yc" rowspan="${span}">Year 1</td>`;
-    } else if (isIns && insCountSoFar > 0 && insCountSoFar % 4 === 0) {
-      // new year group starts — every 4 INS rows
+    } else if (isIns && insCountSoFar % 4 === 0) {
+      // start of a new year group
       const yr = Math.floor(insCountSoFar / 4) + 1;
+      // rowspan = number of rows until next year group (up to 4 INS rows)
       let span = 0, insInGroup = 0;
       for (let j = i; j < s.rows.length && insInGroup < 4; j++) {
         span++;
         if (s.rows[j].desc.startsWith('INS-')) insInGroup++;
       }
       yearCellHtml = `<td class="ph-yc" rowspan="${span}">Year ${yr}</td>`;
+      insCountSoFar++;
+    } else {
+      // covered by rowspan — emit no cell
+      if (isIns) insCountSoFar++;
     }
-    // else: covered by rowspan — emit no cell
-
-    if (isIns && i >= yearStartIdx) insCountSoFar++;
 
     schedRows += `<tr${even}><td>${row.pct}</td><td>${fmtN(row.amt)}</td><td></td><td></td><td>${row.desc}</td><td>${row.date}</td>${yearCellHtml}</tr>`;
   });

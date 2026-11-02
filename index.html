@@ -515,9 +515,9 @@ function buildSchedule(d) {
   if (insN > 0 && r.insPct > 0) {
     for (let i = 1; i <= insN; i++) {
       const a = i === insN ? lastAmt : insAmt;
-      const insOffset = (r.dp2 === 0) ? i - 1 : i;
-      const insBase = (r.dp2 === 0 || !r.dp2d || r.dp2d === 'NA') ? r.dp1d : r.dp2d;
-      rows.push({ desc: `INS-${i}`, pct: fmtP(a, base), amt: a, date: addQtrs(insBase, insOffset), active: true });
+      // INS dates start from 1st ins date (col W), each quarter apart
+      const insStartDate = r.insDate || r.dp1d;
+      rows.push({ desc: `INS-${i}`, pct: fmtP(a, base), amt: a, date: addQtrs(insStartDate, i - 1), active: true });
     }
   }
   return { rows, maintAmt, opsAmt, base, isStoda, adminAmt, r, systemPrice };

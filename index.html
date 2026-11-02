@@ -490,8 +490,15 @@ function handleConfirm() {
 const MO = { Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12 };
 const MN = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function addQtrs(s, n) {
-  if (!s) return '';
-  const pts = s.split('-'); let d = parseInt(pts[0]), m = MO[pts[1]], y = 2000 + parseInt(pts[2]);
+  if (!s || s === 'NA') return '';
+  const pts = s.split('-');
+  if (pts.length < 3) return s;
+  let d = parseInt(pts[0]);
+  let m = MO[pts[1]];
+  // handle both "02-Nov-26" (2-digit year) and "2-Feb-2027" (4-digit year)
+  let y = parseInt(pts[2]);
+  if (y < 100) y += 2000;
+  if (!m) return s; // unrecognised month abbreviation
   m += n * 3; while (m > 12) { m -= 12; y++; }
   return `${String(d).padStart(2,'0')}-${MN[m]}-${String(y).slice(-2)}`;
 }

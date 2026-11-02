@@ -210,6 +210,31 @@ function getYearFrom(project, type, dp2) {
   return 'DP-2';
 }
 
+// ── PROPER CSV PARSER (handles quoted fields with commas) ──
+function parseCSV(text) {
+  const rows = [];
+  const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  for (const line of lines) {
+    if (line.trim() === '') continue;
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQ && line[i+1] === '"') { cur += '"'; i++; } // escaped quote
+        else inQ = !inQ;
+      } else if (ch === ',' && !inQ) {
+        cols.push(cur); cur = '';
+      } else {
+        cur += ch;
+      }
+    }
+    cols.push(cur);
+    rows.push(cols);
+  }
+  return rows;
+}
+
 // ── LOAD SHEET DATA ──
 async function loadSheet() {
   const statusEl = document.getElementById('sheet-status');
@@ -219,7 +244,7 @@ async function loadSheet() {
     const res = await fetch(CSV_URL);
     if (!res.ok) throw new Error('Failed to fetch sheet');
     const text = await res.text();
-    const rows = text.split('\n').map(r => r.split(','));
+    const rows = parseCSV(text);
 
     // Find header row
     const headerIdx = rows.findIndex(r => r[0] === 'Project' && r[1] === 'Type');

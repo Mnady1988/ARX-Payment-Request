@@ -99,7 +99,7 @@
     if (o.error) { box.innerHTML = `<div class="status-msg error">⚠ ${esc(o.error)}</div>`; return; }
     box.innerHTML = `<div class="sum-title">${esc(o.building)} · ${esc(o.floor.label)} · ${o.unit} · ${o.area} m²</div>` +
       `<div class="sum-row"><span class="k">Unit price</span><span class="v">EGP ${egp(o.price)}</span></div>` +
-      `<div class="sum-row"><span class="k">Price / m²</span><span class="v">EGP ${egp(o.price / o.area)}</span></div><hr class="sum-divider">` +
+      `<hr class="sum-divider">` +
       o.plans.map(p => `<div class="sum-row"><span class="k">${p.years} years${p.totalDisc > 0.0001 ? ` <span class="pill">−${(p.totalDisc * 100).toFixed(2)}%</span>` : ''}</span><span class="v">EGP ${egp(p.selling)} · ${p.ins.length} × ${egp(p.ins[0] ? p.ins[0].amt : 0)}</span></div>`).join('');
   }
 
@@ -152,7 +152,6 @@
       ['Unit', 'رقم الوحدة', o.unit],
       ['Built-up area', 'المساحة', o.area + ' m²'],
       ['Unit price', 'سعر الوحدة', 'EGP ' + egp(o.price)],
-      ['Price per m²', 'سعر المتر', 'EGP ' + egp(o.price / o.area)],
     ];
     return page('Your Unit', 'Phase 01 · Type ' + o.type + ' · ' + o.building, `
       <div class="op-two">

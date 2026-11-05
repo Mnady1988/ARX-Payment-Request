@@ -160,7 +160,8 @@
   const imgPage = f => `<section class="op op-img" style="background-image:url('${IMG}${f}')"></section>`;
 
   // Furnished floor plan with only the given unit in full colour (kept for the Unit page).
-  function planStage(type, fl, apn) {
+  const fitBox = (w, h, maxW, maxH) => { const k = Math.min(maxW / w, maxH / h); return `width:${(w * k).toFixed(2)}mm;height:${(h * k).toFixed(2)}mm`; };
+  function planStage(type, fl, apn, box) {
     const alt = (window.ASSL_PLAN_ALT || {})[`${type}_${fl}`];
     const sz = alt ? alt.size : ((window.ASSL_FURN_SIZE || {})[`${type}_${fl}`] || [1, 1]);
     const poly = ((window.ASSL_UNIT_POLY || {})[`${type}-${fl}`] || {})[apn];
@@ -168,7 +169,7 @@
     if (!poly) return `<img src="${src}" alt="">`;
     const clip = poly.map(p => `${(p[0] * 100).toFixed(2)}% ${(p[1] * 100).toFixed(2)}%`).join(',');
     const pts = poly.map(p => `${(p[0] * sz[0]).toFixed(1)},${(p[1] * sz[1]).toFixed(1)}`).join(' ');
-    return `<div class="stage" style="aspect-ratio:${sz[0]}/${sz[1]}">
+    return `<div class="stage" style="${box ? fitBox(sz[0], sz[1], box[0], box[1]) : `aspect-ratio:${sz[0]}/${sz[1]}`}">
       <img class="st-dim" src="${src}" alt=""><img class="st-unit" src="${src}" alt="" style="clip-path:polygon(${clip})">
       <svg viewBox="0 0 ${sz[0]} ${sz[1]}" preserveAspectRatio="none"><polygon points="${pts}"/></svg></div>`;
   }
@@ -184,25 +185,33 @@
       </div>${paperFoot(n)}</section>`;
   }
 
+  // The unit alone, cut out of the furnished plan along its outline.
+  function unitCrop(type, fl, apn, box) {
+    const sz = (window.ASSL_FURN_SIZE || {})[`${type}_${fl}`] || [1, 1];
+    const poly = ((window.ASSL_UNIT_POLY || {})[`${type}-${fl}`] || {})[apn];
+    if (!poly) return '';
+    const xs = poly.map(p => p[0]), ys = poly.map(p => p[1]);
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const bw = x1 - x0, bh = y1 - y0;
+    const clip = poly.map(p => `${(p[0] * 100).toFixed(2)}% ${(p[1] * 100).toFixed(2)}%`).join(',');
+    return `<div class="uc" style="${fitBox(bw * sz[0], bh * sz[1], box[0], box[1])}">
+      <img src="${IMG}furn_${type}_${fl}.jpg" alt="" style="width:${(100 / bw).toFixed(3)}%;height:${(100 / bh).toFixed(3)}%;left:${(-x0 / bw * 100).toFixed(3)}%;top:${(-y0 / bh * 100).toFixed(3)}%;clip-path:polygon(${clip})"></div>`;
+  }
+
   function unitPage(o, n) {
-    const fl = o.ground ? 'G' : 'T', key = `${o.type}-${fl}-${o.unit.slice(3)}`, d = D()[key];
-    let locator, rows, right;
-    if (d) {
-      const [x0, y0, x1, y1] = d.box;
-      locator = `<div class="u-loc"><div class="u-loc-in"><img src="${IMG}furn_${o.type}_${fl}.jpg" alt=""><i style="left:${x0 * 100}%;top:${y0 * 100}%;width:${(x1 - x0) * 100}%;height:${(y1 - y0) * 100}%"></i></div></div><div class="u-cap">مكان الوحدة في الدور</div>`;
-      rows = [['غرف النوم', d.beds], ['الحمامات', d.baths], ['ريسبشن · مطبخ', d.reception], ['تراس', d.terrace]].filter(r => r[1]);
-      right = `<img src="${IMG}${d.img}" alt="">`;
-    } else {
-      locator = `<div class="u-loc"><img src="${IMG}key_${o.type}.jpg" alt=""></div><div class="u-cap">مكان المبنى ${esc(o.building)} في الموقع — الأرقام هي أرقام الوحدات</div>`;
-      rows = [['المبنى', o.building], ['النموذج', 'Type ' + o.type], ['الدور', o.floor.ar], ['رقم الوحدة', o.unit]];
-      right = `<img src="${IMG}line_${o.type}_${fl}.jpg" alt=""><div class="u-note">وحدتك <b>${o.unit}</b> على مسقط الدور</div>`;
-    }
+    const fl = o.ground ? 'G' : 'T', apn = o.unit.slice(3), d = D()[`${o.type}-${fl}-${apn}`];
+    const crop = unitCrop(o.type, fl, apn, [134, 148]);
+    const rows = d
+      ? [['غرف النوم', d.beds], ['الحمامات', d.baths], ['ريسبشن · مطبخ', d.reception], ['تراس', d.terrace]].filter(r => r[1])
+      : [['المبنى', o.building], ['النموذج', 'Type ' + o.type], ['الدور', o.floor.ar], ['رقم الوحدة', o.unit]];
+    const right = crop || `<img src="${IMG}line_${o.type}_${fl}.jpg" alt="">`;
     return `<section class="op op-paper" style="background-image:url('${IMG}paper.jpg')">
       <div class="ph"><h2>Unit ${o.unit}</h2><div class="ph-ar">Type ${o.type} · ${floorAr(o)} · موقع الوحدة في الدور</div></div>
       <div class="u-wrap">
         <div class="u-right">${right}</div>
         <div class="u-left">
-          <div class="u-top"><div class="u-area"><span>مساحة الوحدة</span><b>${o.area}</b><small>m²</small></div><div class="u-locbox">${locator}</div></div>
+          <div class="u-top"><div class="u-area"><span>مساحة الوحدة</span><b>${o.area}</b><small>m²</small></div>
+            <div class="u-locbox"><div class="u-loc">${planStage(o.type, fl, apn, [62, 49])}</div><div class="u-cap">مكان الوحدة في الدور</div></div></div>
           <table class="u-spec">${rows.map(r => `<tr><th>${r[0]}</th><td>${esc(r[1])}</td></tr>`).join('')}</table>
         </div>
       </div>${paperFoot(n)}</section>`;

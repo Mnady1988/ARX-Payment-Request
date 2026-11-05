@@ -230,8 +230,12 @@
   function unitPage(o, n) {
     const fl = o.ground ? 'G' : 'T', apn = o.unit.slice(3), d = D()[`${o.type}-${fl}-${apn}`];
     const crop = unitCrop(o.type, fl, apn, [134, 148]);
+    const rc = ((window.ASSL_ROOMS || {})[`${o.type}-${fl}`] || {})[apn];
     const rows = d
       ? [['غرف النوم', d.beds], ['الحمامات', d.baths], ['ريسبشن · مطبخ', d.reception], ['تراس', d.terrace]].filter(r => r[1])
+      : rc
+      ? [['غرف النوم', rc[0] > 1 ? `${rc[0]} (منها ماستر)` : '1 ماستر'], ['الحمامات', String(rc[1])], ['ريسبشن · مطبخ', '✓'],
+         ['تراس', rc[2] ? String(rc[2]) : '—'], ...(rc[3] ? [['غرفة خادمة', '✓']] : [])]
       : [['المبنى', o.building], ['النموذج', 'Type ' + o.type], ['الدور', o.floor.ar], ['رقم الوحدة', o.unit]];
     const right = crop || `<img src="${IMG}line_${o.type}_${fl}.jpg" alt="">`;
     return `<section class="op op-paper" style="background-image:url('${IMG}paper.jpg')">

@@ -113,7 +113,8 @@
 .u-loc-in img{max-width:100%;max-height:49mm;opacity:.45;}
 .u-loc-in i{position:absolute;border:1.6px solid #C9A24A;background:rgba(201,162,74,.18);}
 .u-cap{direction:rtl;text-align:center;font-size:8pt;color:#8a8473;margin-top:1.5mm;}
-.uc{position:relative;overflow:hidden;flex:none;}
+.uc{flex:none;max-width:none!important;max-height:none!important;object-fit:fill!important;}
+.uc-in{position:absolute;left:50%;top:50%;transform-origin:50% 50%;}
 .uc img{position:absolute;max-width:none;max-height:none;}
 .u-loc .stage{flex:none;}
 .u-loc .stage polygon{stroke-width:9;}

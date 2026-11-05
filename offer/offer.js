@@ -192,10 +192,39 @@
     if (!poly) return '';
     const xs = poly.map(p => p[0]), ys = poly.map(p => p[1]);
     const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
-    const bw = x1 - x0, bh = y1 - y0;
-    const clip = poly.map(p => `${(p[0] * 100).toFixed(2)}% ${(p[1] * 100).toFixed(2)}%`).join(',');
-    return `<div class="uc" style="${fitBox(bw * sz[0], bh * sz[1], box[0], box[1])}">
-      <img src="${IMG}furn_${type}_${fl}.jpg" alt="" style="width:${(100 / bw).toFixed(3)}%;height:${(100 / bh).toFixed(3)}%;left:${(-x0 / bw * 100).toFixed(3)}%;top:${(-y0 / bh * 100).toFixed(3)}%;clip-path:polygon(${clip})"></div>`;
+    const bw = x1 - x0, bh = y1 - y0, pw = bw * sz[0], ph = bh * sz[1];
+    // Straighten units drawn at an angle (Type F wings): align the longest wall with the page.
+    const P = poly.map(p => [p[0] * sz[0], p[1] * sz[1]]);
+    let best = 0, ang = 0;
+    P.forEach((p, i) => { const q = P[(i + 1) % P.length], L = Math.hypot(q[0] - p[0], q[1] - p[1]); if (L > best) { best = L; ang = Math.atan2(q[1] - p[1], q[0] - p[0]); } });
+    ang = ang % (Math.PI / 2); if (ang > Math.PI / 4) ang -= Math.PI / 2; if (ang < -Math.PI / 4) ang += Math.PI / 2;
+    if (Math.abs(ang) < 0.05) ang = 0;
+    const cx = (x0 + x1) / 2 * sz[0], cy = (y0 + y1) / 2 * sz[1], c = Math.cos(-ang), s2 = Math.sin(-ang);
+    const R = P.map(([x, y]) => [(x - cx) * c - (y - cy) * s2, (x - cx) * s2 + (y - cy) * c]);
+    const rw = Math.max(...R.map(r => r[0])) - Math.min(...R.map(r => r[0])), rh = Math.max(...R.map(r => r[1])) - Math.min(...R.map(r => r[1]));
+    const rcx = (Math.max(...R.map(r => r[0])) + Math.min(...R.map(r => r[0]))) / 2, rcy = (Math.max(...R.map(r => r[1])) + Math.min(...R.map(r => r[1]))) / 2;
+    const k = Math.min(box[0] / rw, box[1] / rh);
+    // Drawn into a canvas after render (renderCrops): rotated + clipped CSS images print wrongly in Chrome.
+    const spec = { src: `${IMG}furn_${type}_${fl}.jpg`, P, ang, cx, cy, rcx, rcy, rw, rh };
+    return `<img class="uc" alt="" data-crop='${JSON.stringify(spec)}' style="width:${(rw * k).toFixed(2)}mm;height:${(rh * k).toFixed(2)}mm">`;
+  }
+
+  function renderCrops(root) {
+    const jobs = [...root.querySelectorAll('img[data-crop]')].map(el => new Promise(res => {
+      const c = JSON.parse(el.dataset.crop), im = new Image();
+      im.onload = () => {
+        const sc = 1.6, cv = document.createElement('canvas');
+        cv.width = Math.round(c.rw * sc); cv.height = Math.round(c.rh * sc);
+        const g = cv.getContext('2d');
+        g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height);
+        g.translate(cv.width / 2 - c.rcx * sc, cv.height / 2 - c.rcy * sc); g.scale(sc, sc); g.rotate(-c.ang); g.translate(-c.cx, -c.cy);
+        g.beginPath(); c.P.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.closePath(); g.clip();
+        g.drawImage(im, 0, 0);
+        el.src = cv.toDataURL('image/jpeg', 0.9); el.removeAttribute('data-crop'); res();
+      };
+      im.onerror = res; im.src = c.src;
+    }));
+    return Promise.all(jobs);
   }
 
   function unitPage(o, n) {
@@ -253,6 +282,7 @@
     if (!o || o.error) { alert(o ? o.error : 'Please fill in type, floor, unit and price.'); return; }
     const html = buildOffer(o);
     $('offer-pages').innerHTML = html;
+    window.__cropsReady = renderCrops($('offer-pages'));
     $('print-area').innerHTML = '';
     $('offer-preview').classList.add('show');
     $('offer-preview').scrollTop = 0;
@@ -264,6 +294,7 @@
     document.title = 'ARX Development — Payment Request v2';
   };
   window.printOffer = async function () {
+    if (window.__cropsReady) await window.__cropsReady;
     const pa = $('print-area');
     pa.innerHTML = $('offer-pages').innerHTML;
     document.body.classList.add('printing-offer');

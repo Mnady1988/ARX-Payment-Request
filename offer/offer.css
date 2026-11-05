@@ -72,6 +72,8 @@
 .mp-icons{position:absolute;left:11mm;top:10mm;height:16mm;}
 .mp-wrap{position:absolute;left:14mm;top:36mm;width:266mm;}
 .mp-wrap img{width:100%;}
+.mp-ov{position:absolute;}
+.mp-pill{position:absolute;transform:translateY(-50%);background:#17332A;color:#fff;font-size:10pt;font-weight:700;padding:.9mm 3.2mm;border-radius:3mm;border:.5mm solid #E9DDBF;box-shadow:0 .5mm 2mm rgba(0,0,0,.35);white-space:nowrap;letter-spacing:.02em;}
 .mp-box{position:absolute;border:.9mm solid #C9A24A;background:rgba(201,162,74,.28);border-radius:1mm;box-shadow:0 0 0 .6mm rgba(23,51,42,.55),0 0 6mm rgba(201,162,74,.8);}
 .mp-box span{position:absolute;left:50%;bottom:100%;transform:translate(-50%,-2.2mm);background:#17332A;color:#E3C77E;font-size:9pt;font-weight:700;padding:1mm 3.5mm;white-space:nowrap;direction:rtl;}
 .mp-box span::after{content:'';position:absolute;left:50%;top:100%;transform:translateX(-50%);border:1.6mm solid transparent;border-top-color:#17332A;}

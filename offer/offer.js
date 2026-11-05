@@ -143,8 +143,14 @@
       ${paperFoot(n)}</section>`;
   }
   function masterplanPage(o, n) {
-    const b = (window.ASSL_BUILDING_BOX || {})[o.building];
-    const mark = b ? `<i class="mp-box" style="left:${b[0] * 100}%;top:${b[1] * 100}%;width:${(b[2] - b[0]) * 100}%;height:${(b[3] - b[1]) * 100}%"><span>مبنى ${esc(o.building)}</span></i>` : '';
+    const v = (window.ASSL_BUILDING_OVERLAY || {})[o.building], b = (window.ASSL_BUILDING_BOX || {})[o.building];
+    let mark = '';
+    if (v) {
+      mark = `<img class="mp-ov" src="${IMG}bld_${esc(o.building)}.png" alt="" style="left:${v[0] * 100}%;top:${v[1] * 100}%;width:${(v[2] - v[0]) * 100}%;height:${(v[3] - v[1]) * 100}%">` +
+        `<span class="mp-pill" style="right:${(100 - v[0] * 100 + 0.4).toFixed(2)}%;top:${((v[1] + v[3]) / 2 * 100).toFixed(2)}%">${esc(o.building)}</span>`;
+    } else if (b) {
+      mark = `<i class="mp-box" style="left:${b[0] * 100}%;top:${b[1] * 100}%;width:${(b[2] - b[0]) * 100}%;height:${(b[3] - b[1]) * 100}%"></i>`;
+    }
     return `<section class="op op-paper" style="background-image:url('${IMG}paper.jpg')">
       <img class="mp-icons" src="${IMG}mp_icons.png" alt="">
       <div class="ph"><h2>Masterplan</h2><div class="ph-ar">يمتد أصل على مساحة 43 فدانًا، ليجمع السكن والاستثمار والعمل والترفيه في مجتمع متكامل</div></div>

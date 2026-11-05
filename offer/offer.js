@@ -114,10 +114,9 @@
     return `<section class="op op-cover2">
       <div class="oc-img" style="background-image:url('${IMG}hero.jpg')"></div>
       <div class="oc-shade"></div>
-      <img src="${IMG}arx_gold.png" alt="ARX" class="oc-arx">
+      <img src="${IMG}arx_logo.png" alt="ARX" class="oc-arx">
       <div class="oc-mid">
-        <div class="oc-ar">أصل نيو كايرو</div>
-        <div class="oc-en">ASSL NEW CAIRO</div>
+        <img src="${IMG}assl_gold.png" alt="Assl New Cairo" class="oc-assl">
         <div class="oc-line"></div>
         <div class="oc-tag">UNIT OFFER</div>
       </div>

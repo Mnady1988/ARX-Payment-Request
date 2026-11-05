@@ -166,7 +166,7 @@
       <div class="ph"><h2>Type ${o.type} · ${floorEn(o)}</h2><div class="ph-ar">${floorAr(o)} · ${areas.length} وحدات في الدور</div></div>
       <div class="fl-wrap">
         <div class="fl-plan"><img src="${IMG}furn_${o.type}_${fl}.jpg" alt=""></div>
-        <div class="fl-areas"><div class="fl-t">مساحات الوحدات</div><div class="tiles${areas.length > 9 ? ' t4' : ''}">${tiles}</div></div>
+        <div class="fl-areas"><div class="fl-t">مساحات الوحدات</div><div class="tiles" style="grid-template-columns:repeat(${areas.length},1fr)">${tiles}</div></div>
       </div>${paperFoot(n)}</section>`;
   }
 

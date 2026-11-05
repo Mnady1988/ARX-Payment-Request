@@ -121,6 +121,14 @@
       </div>
     </section>`;
   }
+  function lifePage(n) {
+    const smalls = [['life_gate.jpg', 'البوابة الرئيسية'], ['life_pool.jpg', 'حمام السباحة'], ['life_garden.jpg', 'حدائق خاصة'], ['life_kids.jpg', 'منطقة الأطفال']];
+    const fig = (f, cap, cls = '') => `<figure class="lf ${cls}" style="background-image:url('${IMG}${f}')"><figcaption>${cap}</figcaption></figure>`;
+    return `<section class="op op-paper" style="background-image:url('${IMG}paper.jpg')">
+      <div class="ph"><h2>Life at Assl</h2><div class="ph-ar">العمارات · البوابة · حمام السباحة · الحدائق · منطقة الأطفال</div></div>
+      <div class="lf-wrap">${fig('life_a1.jpg', 'عمارات أصل · Type A', 'lf-hero')}<div class="lf-grid">${smalls.map(x => fig(x[0], x[1])).join('')}</div></div>
+      ${paperFoot(n)}</section>`;
+  }
   const imgPage = f => `<section class="op op-img" style="background-image:url('${IMG}${f}')"></section>`;
 
   function floorPage(o, n) {
@@ -184,7 +192,7 @@
   }
 
   function buildOffer(o) {
-    return coverPage(o) + imgPage('life.jpg') + imgPage('location_page.jpg') + imgPage('masterplan_page.jpg') +
+    return coverPage(o) + lifePage(2) + imgPage('location_page.jpg') + imgPage('masterplan_page.jpg') +
       floorPage(o, 5) + unitPage(o, 6) + paymentPage(o, 7);
   }
 

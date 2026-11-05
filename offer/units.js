@@ -20,5 +20,13 @@ window.ASSL_UNITS = {
        G: [163, 156, 153, 144, 162, 93, 94, 95, 92],
        T: [185, 157, 154, 165, 181, 107, 108, 108, 107] },
 };
+// Optional per-unit details for the "Unit AP-xx" page, keyed "Type-Floor-AP" (Floor G or T).
+//   box: unit outline on furn_<Type>_<Floor>.jpg as fractions [x0, y0, x1, y1] (highlighted on the locator)
+//   img: close-up image in offer/img; beds / baths / reception / terrace: room schedule
+// Units without an entry get the fallback page (key plan + floor plan with AP numbers).
+window.ASSL_UNIT_DETAIL = {
+  'H-G-04': { box: [0.163, 0.452, 0.445, 0.625], img: 'unit_H_G_04.jpg',
+              beds: '3 (منها ماستر بدريسنج)', baths: '3', reception: '✓', terrace: '1' },
+};
 // Project name as it appears in the "Project Payments" sheet
 window.OFFER_PROJECT = 'Assl New Cairo';

@@ -103,114 +103,88 @@
       o.plans.map(p => `<div class="sum-row"><span class="k">${p.years} years${p.totalDisc > 0.0001 ? ` <span class="pill">−${(p.totalDisc * 100).toFixed(2)}%</span>` : ''}</span><span class="v">EGP ${egp(p.selling)} · ${p.ins.length} × ${egp(p.ins[0] ? p.ins[0].amt : 0)}</span></div>`).join('');
   }
 
-  // ── PDF pages ──
-  const lhTop = `<img class="op-lh-top" src="${IMG}lh_header.png" alt="">`;
-  const lhBottom = `<img class="op-lh-bot" src="${IMG}lh_footer.png" alt="">`;
-  const mark = `<img class="op-mark" src="${IMG}lh_mark.png" alt="">`;
-  function page(title, sub, body, n) {
-    return `<section class="op op-lh">${lhTop}${mark}<div class="op-body">
-      <div class="op-h"><div class="op-kicker">${esc(sub)}</div><h2>${esc(title)}</h2></div>${body}</div>
-      <div class="op-pno">${n}</div>${lhBottom}</section>`;
-  }
+  // ── PDF pages (A4 landscape, same order as the Assl unit offer) ──
+  const D = () => window.ASSL_UNIT_DETAIL || {};
+  const pn = n => String(n).padStart(2, '0');
+  const paperFoot = n => `<div class="pf"><span>ASSL NEW CAIRO</span><span>${pn(n)}</span></div>`;
+  const floorEn = o => o.ground ? 'Ground Floor' : 'Typical Floor';
+  const floorAr = o => o.ground ? 'الدور الأرضي' : 'الدور المتكرر';
 
   function coverPage(o) {
-    return `<section class="op op-cover">
-      <div class="oc-img" style="background-image:url('${IMG}hero.jpg')"></div>
-      <div class="oc-shade"></div>
-      <div class="oc-top"><img src="${ARX_LOGO_PDF}" alt="ARX" class="oc-arx"></div>
-      <div class="oc-mid">
-        <div class="oc-ar">أصل نيو كايرو</div>
-        <div class="oc-en">ASSL NEW CAIRO</div>
-        <div class="oc-line"></div>
-        <div class="oc-tag">UNIT OFFER</div>
-      </div>
-      <div class="oc-card">
-        <div class="oc-grid">
-          <div><span>Building</span><b>${esc(o.building)}</b></div>
-          <div><span>Unit</span><b>${o.unit}</b></div>
-          <div><span>Floor</span><b>${o.ground ? 'Ground' : esc(o.floor.label.replace('Typical · ', ''))}</b></div>
-          <div><span>Area</span><b>${o.area} m²</b></div>
-        </div>
-        ${o.client ? `<div class="oc-for">Prepared for <b>${esc(o.client)}</b></div>` : ''}
-        <div class="oc-date">${o.date}</div>
+    return `<section class="op op-cover" style="background-image:url('${IMG}cover_bg.jpg')">
+      <div class="cv-box">
+        <div class="cv-line"></div>
+        <div class="cv-type">TYPE ${o.type} · ${floorEn(o).toUpperCase()}</div>
+        <div class="cv-ar">${o.floor.ar} — نموذج ${o.type} — مبنى ${esc(o.building)}</div>
+        <div class="cv-unit"><span class="cv-unit-ar">الوحدة رقم <b>${o.unit.slice(3)}</b></span><span class="cv-sep"></span><span class="cv-unit-en">UNIT ${o.unit}</span></div>
       </div>
     </section>`;
   }
+  const imgPage = f => `<section class="op op-img" style="background-image:url('${IMG}${f}')"></section>`;
 
-  function projectPage(o, n) {
-    return page('The Project', 'Assl New Cairo · ARX Development', `
-      <div class="op-fig"><img src="${IMG}location.jpg" alt="Location"><div class="op-cap">Location</div></div>
-      <div class="op-fig"><img src="${IMG}masterplan.jpg" alt="Master plan"><div class="op-cap">Master plan</div></div>`, n);
+  function floorPage(o, n) {
+    const fl = o.ground ? 'G' : 'T', areas = U[o.type][fl];
+    const tiles = areas.map((a, i) => `<div class="tile${i === o.unitIdx ? ' sel' : ''}"><span>${ap(i)}</span><b>${a}<small> m²</small></b></div>`).join('');
+    return `<section class="op op-paper" style="background-image:url('${IMG}paper.jpg')">
+      <div class="ph"><h2>Type ${o.type} · ${floorEn(o)}</h2><div class="ph-ar">${floorAr(o)} · ${areas.length} وحدات في الدور</div></div>
+      <div class="fl-wrap">
+        <div class="fl-plan"><img src="${IMG}furn_${o.type}_${fl}.jpg" alt=""></div>
+        <div class="fl-areas"><div class="fl-t">مساحات الوحدات</div><div class="tiles${areas.length > 9 ? ' t4' : ''}">${tiles}</div></div>
+      </div>${paperFoot(n)}</section>`;
   }
 
-  function buildingPage(o, n) {
-    const areas = U[o.type][o.ground ? 'G' : 'T'];
-    const rows = [
-      ['Project', 'المشروع', 'Assl New Cairo'],
-      ['Building', 'المبنى', o.building + ' · Type ' + o.type],
-      ['Floor', 'الدور', o.floor.label, o.floor.ar],
-      ['Unit', 'رقم الوحدة', o.unit],
-      ['Built-up area', 'المساحة', o.area + ' m²'],
-      ['Unit price', 'سعر الوحدة', 'EGP ' + egp(o.price)],
-    ];
-    return page('Your Unit', 'Phase 01 · Type ' + o.type + ' · ' + o.building, `
-      <div class="op-two">
-        <div class="op-fig op-key"><img src="${IMG}key_${o.type}.jpg" alt="Key plan"><div class="op-cap">Building ${esc(o.building)} on the Phase 01 key plan — circled numbers are unit (AP) numbers</div></div>
-        <table class="op-spec">${rows.map(r => `<tr><th>${r[0]}<small>${r[1]}</small></th><td>${esc(r[2])}${r[3] ? `<small class="ar">${esc(r[3])}</small>` : ''}</td></tr>`).join('')}</table>
-      </div>
-      <div class="op-areas-t">Type ${o.type} · ${o.ground ? 'ground floor' : 'typical floor'} unit areas</div>
-      <table class="op-areas"><tr>${areas.map((a, i) => `<th class="${i === o.unitIdx ? 'sel' : ''}">${ap(i)}</th>`).join('')}</tr>
-      <tr>${areas.map((a, i) => `<td class="${i === o.unitIdx ? 'sel' : ''}">${a} m²</td>`).join('')}</tr></table>`, n);
-  }
-
-  function planPage(o, n) {
-    const fl = o.ground ? 'G' : 'T';
-    return page('Floor Plan', 'Type ' + o.type + ' · ' + (o.ground ? 'Ground floor' : 'Typical floor') + ' · your unit: ' + o.unit, `
-      <div class="op-fig"><img src="${IMG}line_${o.type}_${fl}.jpg" alt="Floor plan with unit numbers"><div class="op-cap">Unit numbers (AP) — your unit is <b>${o.unit}</b></div></div>
-      <div class="op-fig op-furn"><img src="${IMG}furn_${o.type}_${fl}.jpg" alt="Furnished plan"><div class="op-cap">Furnished plan (illustrative)</div></div>`, n);
+  function unitPage(o, n) {
+    const fl = o.ground ? 'G' : 'T', key = `${o.type}-${fl}-${o.unit.slice(3)}`, d = D()[key];
+    let locator, rows, right;
+    if (d) {
+      const [x0, y0, x1, y1] = d.box;
+      locator = `<div class="u-loc"><div class="u-loc-in"><img src="${IMG}furn_${o.type}_${fl}.jpg" alt=""><i style="left:${x0 * 100}%;top:${y0 * 100}%;width:${(x1 - x0) * 100}%;height:${(y1 - y0) * 100}%"></i></div></div><div class="u-cap">مكان الوحدة في الدور</div>`;
+      rows = [['غرف النوم', d.beds], ['الحمامات', d.baths], ['ريسبشن · مطبخ', d.reception], ['تراس', d.terrace]].filter(r => r[1]);
+      right = `<img src="${IMG}${d.img}" alt="">`;
+    } else {
+      locator = `<div class="u-loc"><img src="${IMG}key_${o.type}.jpg" alt=""></div><div class="u-cap">مكان المبنى ${esc(o.building)} في الموقع — الأرقام هي أرقام الوحدات</div>`;
+      rows = [['المبنى', o.building], ['النموذج', 'Type ' + o.type], ['الدور', o.floor.ar], ['رقم الوحدة', o.unit]];
+      right = `<img src="${IMG}line_${o.type}_${fl}.jpg" alt=""><div class="u-note">وحدتك <b>${o.unit}</b> على مسقط الدور</div>`;
+    }
+    return `<section class="op op-paper" style="background-image:url('${IMG}paper.jpg')">
+      <div class="ph"><h2>Unit ${o.unit}</h2><div class="ph-ar">Type ${o.type} · ${floorAr(o)} · موقع الوحدة في الدور</div></div>
+      <div class="u-wrap">
+        <div class="u-right">${right}</div>
+        <div class="u-left">
+          <div class="u-top"><div class="u-area"><span>مساحة الوحدة</span><b>${o.area}</b><small>m²</small></div><div class="u-locbox">${locator}</div></div>
+          <table class="u-spec">${rows.map(r => `<tr><th>${r[0]}</th><td>${esc(r[1])}</td></tr>`).join('')}</table>
+        </div>
+      </div>${paperFoot(n)}</section>`;
   }
 
   function paymentPage(o, n) {
-    const cards = o.plans.map(p => {
-      const first = p.ins[0];
-      const disc = [];
-      if (p.r.launch > 0) disc.push((p.r.launch * 100).toFixed(0) + '% launch offer');
-      if (p.r.dis > 0) disc.push(p.r.dis + '% plan discount');
-      const best = p.r.dis > 0 && p.r.dis === Math.max(...o.plans.map(x => x.r.dis));
-      return `<div class="pc${best ? ' pc-best' : ''}">${best ? '<div class="pc-flag">BEST VALUE</div>' : ''}
-        <div class="pc-y">${p.years}<small>YEARS</small></div>
-        <div class="pc-d">${disc.join(' + ') || 'Standard price'}</div>
-        <div class="pc-price"><span>Price after discount</span><b>EGP ${egp(p.selling)}</b>${p.saving > 0 ? `<em>You save EGP ${egp(p.saving)}</em>` : ''}</div>
-        <dl>
-          <dt>Down payment (${(p.r.dp1 * 100 + p.r.dp2 * 100).toFixed(0)}%)</dt><dd>EGP ${egp(p.dp)}</dd>
-          <dt>Quarterly installment</dt><dd>EGP ${egp(first ? first.amt : 0)}</dd>
-          <dt>Number of installments</dt><dd>${p.ins.length}</dd>
-          <dt>First installment</dt><dd>${esc(first ? first.date : '—')}</dd>
-          <dt>Maintenance deposit (${(p.r.maint * 100).toFixed(0)}%)</dt><dd>EGP ${egp(p.maint)}</dd>
-        </dl></div>`;
-    }).join('');
-    return page('Payment Plans', 'Unit price EGP ' + egp(o.price) + ' · ' + o.building + ' ' + o.unit, `
-      <div class="pcs">${cards}</div>
-      <ul class="op-notes">
-        <li>Discounts apply to the unit price; the launch offer is applied first, then the plan discount.</li>
-        <li>Installments are paid quarterly after the down payment.</li>
-        <li>The maintenance deposit is calculated on the unit price and paid separately on ${esc(o.plans[0].r.maintDate || 'the date set in the contract')}.</li>
-        <li>Prices and payment plans are subject to change without prior notice until the reservation is confirmed.</li>
-      </ul>`, n);
-  }
-
-  function schedulePage(o, n) {
-    const cols = o.plans.map(p => `<div class="sc"><div class="sc-h">${p.years} Years<small>EGP ${egp(p.selling)}</small></div>
-      <table><thead><tr><th></th><th>Date</th><th>Amount</th></tr></thead><tbody>
-      ${p.sched.rows.map(x => `<tr${x.desc.startsWith('DP') ? ' class="dp"' : ''}><td>${x.desc.replace('INS-', '')}</td><td>${esc(x.date)}</td><td>${egp(x.amt)}</td></tr>`).join('')}
-      <tr class="tot"><td></td><td>Total</td><td>${egp(p.selling)}</td></tr></tbody></table></div>`).join('');
-    const contact = (o.sales || o.mobile) ? `<div class="op-contact">Your sales consultant: <b>${esc(o.sales)}</b>${o.mobile ? ' · ' + esc(o.mobile) : ''} · Hotline 16591</div>` : '';
-    return page('Payment Schedules', 'Quarterly installments for each plan (EGP)', `<div class="scs">${cols}</div>${contact}`, n);
+    const P = o.plans.slice().sort((a, b) => (b.years || 0) - (a.years || 0)); // 10, 8, 6 (right → left)
+    const launch = Math.max(...P.map(p => p.r.launch || 0));
+    const pct = v => (Math.round(v * 1000) / 10) + '%';
+    const row = (label, f, cls = '') => `<tr class="${cls}"><th>${label}</th>${P.map(p => `<td>${f(p)}</td>`).join('')}</tr>`;
+    return `<section class="op op-lea" style="background-image:url('${IMG}leather_bg.jpg')">
+      ${launch > 0 ? `<div class="pp-badge">خصم إضافي <span dir="ltr">${pct(launch)}</span> · <b>Launch Offer</b></div>` : ''}
+      <div class="ph ph-dark"><h2>Payment Plans</h2><div class="ph-ar">سعر الوحدة ${egp(o.price)} جنيه · مبنى ${esc(o.building)} · ${o.unit}</div></div>
+      <table class="pp">
+        <thead><tr><th></th>${P.map(p => `<th>${p.years} سنوات</th>`).join('')}</tr></thead>
+        <tbody>
+          ${row('خصم نظام السداد', p => p.r.dis > 0 ? p.r.dis + '%' : '—')}
+          ${row('عرض الإطلاق', p => p.r.launch > 0 ? pct(p.r.launch) : '—')}
+          ${row('السعر بعد الخصم', p => egp(p.selling), 'hl')}
+          ${row('مقدم التعاقد', p => `${pct(p.r.dp1 + p.r.dp2)} <small>${egp(p.dp)}</small>`)}
+          ${row('الأقساط', p => `${p.ins.length} قسط ربع سنوي`)}
+          ${row('قيمة القسط', p => egp(p.ins[0] ? p.ins[0].amt : 0), 'hl')}
+          ${row('وديعة الصيانة', p => `${pct(p.r.maint)} <small>${egp(p.maint)}</small>`)}
+        </tbody>
+      </table>
+      <div class="pp-note">الخصومات بالتتابع: خصم الإطلاق ثم خصم نظام السداد · الأقساط ربع سنوية تبدأ ${esc(P[0].ins[0] ? P[0].ins[0].date : '')} · الأسعار بالجنيه المصري ولا تشمل رسوم التسجيل · وديعة الصيانة على سعر الوحدة</div>
+      <div class="pf pf-dark"><span>ASSL NEW CAIRO <img src="${ARX_LOGO_PDF}" alt=""></span><span>${pn(n)}</span></div>
+    </section>`;
   }
 
   function buildOffer(o) {
-    let n = 2;
-    return coverPage(o) + projectPage(o, n++) + buildingPage(o, n++) + planPage(o, n++) + paymentPage(o, n++) + schedulePage(o, n++);
+    return coverPage(o) + imgPage('life.jpg') + imgPage('location_page.jpg') + imgPage('masterplan_page.jpg') +
+      floorPage(o, 5) + unitPage(o, 6) + paymentPage(o, 7);
   }
 
   // ── preview / print ──
@@ -236,7 +210,7 @@
     if (!$('offer-page-style')) {
       const st = document.createElement('style');
       st.id = 'offer-page-style';
-      st.textContent = '@page{size:A4 portrait;margin:0}';
+      st.textContent = '@page{size:A4 landscape;margin:0}';
       document.head.appendChild(st);
     }
     const imgs = [...pa.querySelectorAll('img')];
@@ -252,8 +226,8 @@
     }
   });
   function fitOffer() {
-    const w = Math.min(window.innerWidth - 24, 794);
-    $('offer-pages').style.zoom = (w / 794).toFixed(3);
+    const w = Math.min(window.innerWidth - 24, 1123);
+    $('offer-pages').style.zoom = (w / 1123).toFixed(3);
   }
   window.addEventListener('resize', () => { if ($('offer-preview').classList.contains('show')) fitOffer(); });
 

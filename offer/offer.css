@@ -37,15 +37,20 @@
 .pf-dark{border-color:rgba(201,162,74,.35);color:#a9a38d;}
 .pf-dark img{display:inline-block;height:3.6mm;vertical-align:middle;margin-left:2mm;filter:brightness(0) invert(1);opacity:.9;}
 /* cover */
-.cv-box{position:absolute;left:0;right:0;top:133mm;text-align:center;color:#EDE3C8;}
-.cv-line{width:16mm;height:.6px;background:#C9A24A;margin:0 auto 5mm;}
-.cv-type{font-family:'Cinzel',serif;font-weight:600;font-size:17pt;letter-spacing:.24em;}
-.cv-ar{direction:rtl;font-size:10.5pt;color:#c8c1a8;margin-top:1.5mm;}
-.cv-unit{display:inline-flex;align-items:center;gap:4mm;margin-top:6mm;border:1px solid #C9A24A;padding:2.4mm 7mm;}
-.cv-unit-ar{direction:rtl;font-size:10pt;color:#e2d6b5;}
-.cv-unit-ar b{font-weight:700;color:#fff;}
-.cv-sep{width:1px;height:6mm;background:#C9A24A;}
-.cv-unit-en{font-family:'Cinzel',serif;font-weight:700;font-size:14pt;letter-spacing:.2em;color:#E3C77E;}
+.op-cover2{background:#17332A;color:#fff;}
+.oc-img{position:absolute;inset:0;background-size:cover;background-position:center 60%;}
+.oc-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(23,51,42,.88) 0%,rgba(23,51,42,.45) 32%,rgba(23,51,42,.12) 52%,rgba(23,51,42,.80) 74%,rgba(23,51,42,.97) 88%);}
+.oc-arx{position:absolute;top:10mm;left:12mm;height:15mm;}
+.oc-mid{position:absolute;top:22mm;left:0;right:0;text-align:center;}
+.oc-ar{font-family:'Cairo';font-size:30pt;font-weight:700;color:#E3C77E;line-height:1.2;}
+.oc-en{font-family:'Cinzel',serif;font-size:25pt;letter-spacing:.14em;font-weight:600;}
+.oc-line{width:40mm;height:1px;background:#C9A24A;margin:4mm auto;}
+.oc-tag{font-family:'Cinzel',serif;font-size:12pt;letter-spacing:.4em;color:#E3C77E;}
+.oc-card{position:absolute;left:40mm;right:40mm;bottom:14mm;border:1px solid rgba(201,162,74,.7);padding:6mm 9mm;background:rgba(15,36,29,.6);}
+.oc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm;}
+.oc-grid span{display:block;font-size:8pt;color:#C9A24A;letter-spacing:.12em;text-transform:uppercase;}
+.oc-grid b{font-family:'Cinzel',serif;font-size:15pt;font-weight:600;}
+.oc-date{position:absolute;right:8mm;top:-3.2mm;background:#C9A24A;color:#17332A;font-size:8.5pt;font-weight:700;padding:.8mm 3mm;}
 /* floor page */
 .fl-wrap{position:absolute;top:33mm;left:11mm;right:11mm;bottom:15mm;display:grid;grid-template-columns:1fr 104mm;gap:6mm;direction:rtl;}
 .fl-plan{direction:ltr;background:#fff;border:.6px solid #d6ccb4;display:flex;align-items:center;justify-content:center;padding:5mm;}

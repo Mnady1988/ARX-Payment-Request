@@ -111,12 +111,24 @@
   const floorAr = o => o.ground ? 'الدور الأرضي' : 'الدور المتكرر';
 
   function coverPage(o) {
-    return `<section class="op op-cover" style="background-image:url('${IMG}cover_bg.jpg')">
-      <div class="cv-box">
-        <div class="cv-line"></div>
-        <div class="cv-type">TYPE ${o.type} · ${floorEn(o).toUpperCase()}</div>
-        <div class="cv-ar">${o.floor.ar} — نموذج ${o.type} — مبنى ${esc(o.building)}</div>
-        <div class="cv-unit"><span class="cv-unit-ar">الوحدة رقم <b>${o.unit.slice(3)}</b></span><span class="cv-sep"></span><span class="cv-unit-en">UNIT ${o.unit}</span></div>
+    return `<section class="op op-cover2">
+      <div class="oc-img" style="background-image:url('${IMG}hero.jpg')"></div>
+      <div class="oc-shade"></div>
+      <img src="${IMG}arx_gold.png" alt="ARX" class="oc-arx">
+      <div class="oc-mid">
+        <div class="oc-ar">أصل نيو كايرو</div>
+        <div class="oc-en">ASSL NEW CAIRO</div>
+        <div class="oc-line"></div>
+        <div class="oc-tag">UNIT OFFER</div>
+      </div>
+      <div class="oc-card">
+        <div class="oc-grid">
+          <div><span>Building</span><b>${esc(o.building)}</b></div>
+          <div><span>Unit</span><b>${o.unit}</b></div>
+          <div><span>Floor</span><b>${o.ground ? 'Ground' : esc(o.floor.label.replace('Typical · ', ''))}</b></div>
+          <div><span>Area</span><b>${o.area} m²</b></div>
+        </div>
+        <div class="oc-date">${o.date}</div>
       </div>
     </section>`;
   }

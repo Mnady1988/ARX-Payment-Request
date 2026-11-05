@@ -159,13 +159,27 @@
   }
   const imgPage = f => `<section class="op op-img" style="background-image:url('${IMG}${f}')"></section>`;
 
+  // Furnished floor plan; when the unit outline is known, everything but the unit is faded.
+  function planStage(type, fl, apn) {
+    const alt = (window.ASSL_PLAN_ALT || {})[`${type}_${fl}`];
+    const sz = alt ? alt.size : ((window.ASSL_FURN_SIZE || {})[`${type}_${fl}`] || [1, 1]);
+    const poly = ((window.ASSL_UNIT_POLY || {})[`${type}-${fl}`] || {})[apn];
+    const src = alt ? `${IMG}${alt.img}` : `${IMG}furn_${type}_${fl}.jpg`;
+    if (!poly) return `<img src="${src}" alt="">`;
+    const clip = poly.map(p => `${(p[0] * 100).toFixed(2)}% ${(p[1] * 100).toFixed(2)}%`).join(',');
+    const pts = poly.map(p => `${(p[0] * sz[0]).toFixed(1)},${(p[1] * sz[1]).toFixed(1)}`).join(' ');
+    return `<div class="stage" style="aspect-ratio:${sz[0]}/${sz[1]}">
+      <img class="st-dim" src="${src}" alt=""><img class="st-unit" src="${src}" alt="" style="clip-path:polygon(${clip})">
+      <svg viewBox="0 0 ${sz[0]} ${sz[1]}" preserveAspectRatio="none"><polygon points="${pts}"/></svg></div>`;
+  }
+
   function floorPage(o, n) {
     const fl = o.ground ? 'G' : 'T', areas = U[o.type][fl];
     const tiles = areas.map((a, i) => `<div class="tile${i === o.unitIdx ? ' sel' : ''}"><span>${ap(i)}</span><b>${a}<small> m²</small></b></div>`).join('');
     return `<section class="op op-paper" style="background-image:url('${IMG}paper.jpg')">
       <div class="ph"><h2>Type ${o.type} · ${floorEn(o)}</h2><div class="ph-ar">${floorAr(o)} · ${areas.length} وحدات في الدور</div></div>
       <div class="fl-wrap">
-        <div class="fl-plan"><img src="${IMG}furn_${o.type}_${fl}.jpg" alt=""></div>
+        <div class="fl-plan">${planStage(o.type, fl, o.unit.slice(3))}</div>
         <div class="fl-areas"><div class="fl-t">مساحات الوحدات</div><div class="tiles" style="grid-template-columns:repeat(${areas.length},1fr)">${tiles}</div></div>
       </div>${paperFoot(n)}</section>`;
   }

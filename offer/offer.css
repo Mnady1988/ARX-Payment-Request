@@ -68,6 +68,13 @@
 .loc-d b small{font-family:'Cairo',sans-serif;font-size:9pt;font-weight:700;letter-spacing:.12em;color:#C9A24A;margin-left:1.5mm;}
 .loc-d span{display:block;font-size:11pt;font-weight:700;margin-top:1.5mm;}
 .loc-d em{display:block;font-style:normal;font-size:8pt;color:#8a8473;}
+/* masterplan page */
+.mp-icons{position:absolute;left:11mm;top:10mm;height:16mm;}
+.mp-wrap{position:absolute;left:14mm;top:36mm;width:266mm;}
+.mp-wrap img{width:100%;}
+.mp-box{position:absolute;border:.9mm solid #C9A24A;background:rgba(201,162,74,.28);border-radius:1mm;box-shadow:0 0 0 .6mm rgba(23,51,42,.55),0 0 6mm rgba(201,162,74,.8);}
+.mp-box span{position:absolute;left:50%;bottom:100%;transform:translate(-50%,-2.2mm);background:#17332A;color:#E3C77E;font-size:9pt;font-weight:700;padding:1mm 3.5mm;white-space:nowrap;direction:rtl;}
+.mp-box span::after{content:'';position:absolute;left:50%;top:100%;transform:translateX(-50%);border:1.6mm solid transparent;border-top-color:#17332A;}
 /* floor page */
 .fl-wrap{position:absolute;top:33mm;left:11mm;right:11mm;bottom:15mm;display:grid;grid-template-rows:minmax(0,1fr);grid-template-columns:1fr 104mm;gap:6mm;direction:rtl;}
 .fl-plan{min-height:0;overflow:hidden;direction:ltr;background:#fff;border:.6px solid #d6ccb4;display:flex;align-items:center;justify-content:center;padding:5mm;}

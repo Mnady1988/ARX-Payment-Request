@@ -142,6 +142,15 @@
       </div>
       ${paperFoot(n)}</section>`;
   }
+  function masterplanPage(o, n) {
+    const b = (window.ASSL_BUILDING_BOX || {})[o.building];
+    const mark = b ? `<i class="mp-box" style="left:${b[0] * 100}%;top:${b[1] * 100}%;width:${(b[2] - b[0]) * 100}%;height:${(b[3] - b[1]) * 100}%"><span>مبنى ${esc(o.building)}</span></i>` : '';
+    return `<section class="op op-paper" style="background-image:url('${IMG}paper.jpg')">
+      <img class="mp-icons" src="${IMG}mp_icons.png" alt="">
+      <div class="ph"><h2>Masterplan</h2><div class="ph-ar">يمتد أصل على مساحة 43 فدانًا، ليجمع السكن والاستثمار والعمل والترفيه في مجتمع متكامل</div></div>
+      <div class="mp-wrap"><img src="${IMG}masterplan_cut.webp" alt="Masterplan">${mark}</div>
+      ${paperFoot(n)}</section>`;
+  }
   const imgPage = f => `<section class="op op-img" style="background-image:url('${IMG}${f}')"></section>`;
 
   function floorPage(o, n) {
@@ -205,7 +214,7 @@
   }
 
   function buildOffer(o) {
-    return coverPage(o) + lifePage(2) + locationPage(3) + imgPage('masterplan_page.jpg') +
+    return coverPage(o) + lifePage(2) + locationPage(3) + masterplanPage(o, 4) +
       floorPage(o, 5) + unitPage(o, 6) + paymentPage(o, 7);
   }
 

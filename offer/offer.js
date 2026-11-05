@@ -129,6 +129,19 @@
       <div class="lf-wrap">${fig('life_a1.jpg', 'عمارات أصل · Type A', 'lf-hero')}<div class="lf-grid">${smalls.map(x => fig(x[0], x[1])).join('')}</div></div>
       ${paperFoot(n)}</section>`;
   }
+  function locationPage(n) {
+    const d = [['10', 'طريق السويس', 'Suez Road'], ['20', 'مطار القاهرة الدولي', 'Cairo International Airport'],
+               ['5', 'الجامعة الأمريكية', 'AUC'], ['15', 'العاصمة الإدارية الجديدة', 'New Administrative Capital']];
+    return `<section class="op op-paper" style="background-image:url('${IMG}paper.jpg')">
+      <img class="loc-map" src="${IMG}location_map.png" alt="Location map"><div class="loc-pin">أصل نيو كايرو</div>
+      <div class="ph"><h2>Location</h2><div class="ph-ar">قلب التجمع السادس · القاهرة الجديدة</div></div>
+      <div class="loc-txt">
+        <p class="loc-ar">يقع أصل في قلب التجمع السادس، في واحدة من أكثر مناطق القاهرة الجديدة تميزًا وأسرعها نموًا، وعلى بُعد دقائق من أهم الطرق والوجهات الحيوية.</p>
+        <p class="loc-en">Assl sits at the heart of Sixth Settlement, one of New Cairo's most strategic and fastest-growing areas, minutes from major roads and vital destinations.</p>
+        <div class="loc-d">${d.map(x => `<div><b>${x[0]}<small>MIN</small></b><span>${x[1]}</span><em>${x[2]}</em></div>`).join('')}</div>
+      </div>
+      ${paperFoot(n)}</section>`;
+  }
   const imgPage = f => `<section class="op op-img" style="background-image:url('${IMG}${f}')"></section>`;
 
   function floorPage(o, n) {
@@ -192,7 +205,7 @@
   }
 
   function buildOffer(o) {
-    return coverPage(o) + lifePage(2) + imgPage('location_page.jpg') + imgPage('masterplan_page.jpg') +
+    return coverPage(o) + lifePage(2) + locationPage(3) + imgPage('masterplan_page.jpg') +
       floorPage(o, 5) + unitPage(o, 6) + paymentPage(o, 7);
   }
 

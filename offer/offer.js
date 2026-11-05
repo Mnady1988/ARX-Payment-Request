@@ -5,6 +5,7 @@
   const U = window.ASSL_UNITS;
   const IMG = 'offer/img/';
   const $ = id => document.getElementById(id);
+  const val = id => ($(id) ? $(id).value.trim() : '');
   const FLOORS = [
     { v: 'G', label: 'Ground floor', ar: 'الدور الأرضي' },
     { v: '1', label: 'Typical · 1st floor', ar: 'الدور الأول' },
@@ -84,7 +85,7 @@
     const area = U[k][fl === 'G' ? 'G' : 'T'][+ui];
     return {
       type: k, building: $('of-building').value, floor, ground: fl === 'G', unitIdx: +ui, unit: ap(+ui), area, price,
-      client: $('of-client').value.trim(), sales: $('of-sales').value.trim(), mobile: $('of-mobile').value.trim(),
+      client: val('of-client'), sales: val('of-sales'), mobile: val('of-mobile'),
       date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
       plans: plans.map(r => planCalc(r, price)),
     };

@@ -20,7 +20,6 @@
 .offer-bar .b-print{background:#C9A24A;color:#17332A;}
 .offer-bar .b-ghost{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.5);}
 .offer-bar button:disabled{opacity:.6;cursor:wait;}
-.touch-device .offer-bar .b-ghost{display:none;}
 .offer-bar .b-close{background:#fff;color:#17332A;}
 #offer-pages{width:1123px;margin:0 auto;}
 #offer-pages .op{margin-bottom:14px;box-shadow:0 6px 30px rgba(0,0,0,.35);}
@@ -148,3 +147,4 @@
 /* values filled into the pre-made PDF pages */
 .dyn{display:inline-block;text-align:center;white-space:nowrap;}
 .tpl .dyn{color:transparent!important;}
+.no-share #offer-share-btn{display:none;}

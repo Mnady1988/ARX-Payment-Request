@@ -505,25 +505,36 @@
     const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name;
     document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 60000);
   }
-  window.shareOffer = async function () {
-    const btn = $('offer-share-btn'), label = '⤴ Share / Save PDF';
-    if (readyFile && readyKey === offerKey()) {             // second tap: file already built, share right away
+  // Two buttons: Save always downloads the file; Share opens the phone/PC share sheet.
+  let cache = null, cacheKey = '';
+  async function getFile() {
+    if (cache && cacheKey === offerKey()) return cache;
+    cache = await buildPdfFile(); cacheKey = offerKey(); return cache;
+  }
+  async function run(btnId, label, action) {
+    const btn = $(btnId);
+    if (readyFile && readyKey === offerKey() && btnId === 'offer-share-btn') {   // second tap after a slow build
       await deliver(readyFile); readyFile = null; if (btn) btn.innerHTML = label; return;
     }
     if (btn) { btn.disabled = true; btn.innerHTML = 'Preparing PDF…'; }
     try {
-      const file = await buildPdfFile();
-      if (btn) btn.disabled = false;
+      const file = await getFile();
+      if (btn) { btn.disabled = false; btn.innerHTML = label; }
+      if (action === 'save') { download(file); return; }
       const done = await deliver(file);
-      if (!done) { readyFile = file; readyKey = offerKey(); if (btn) btn.innerHTML = '✓ PDF ready · tap to share'; return; }
-      if (btn) btn.innerHTML = label;
+      if (!done) { readyFile = file; readyKey = offerKey(); if (btn) btn.innerHTML = '✓ PDF ready · tap to share'; }
     } catch (e) {
       if (btn) { btn.disabled = false; btn.innerHTML = label; }
       alert('Could not create the PDF (' + (e && e.message ? e.message : e) + '). Check the internet connection and try again.');
     }
-  };
+  }
+  window.saveOffer = () => run('offer-save-btn', '⬇ Save PDF', 'save');
+  window.shareOffer = () => run('offer-share-btn', '⤴ Share', 'share');
+  // hide Share where the browser cannot share files
+  try { if (!(navigator.canShare && navigator.canShare({ files: [new File(['x'], 'x.pdf', { type: 'application/pdf' })] }))) document.documentElement.classList.add('no-share'); }
+  catch (e) { document.documentElement.classList.add('no-share'); }
   window.__buildPdfFile = buildPdfFile;
-  window.printOffer = window.shareOffer;
+  window.printOffer = window.saveOffer;
 
   window.addEventListener('afterprint', () => {
     if (document.body.classList.contains('printing-offer')) {

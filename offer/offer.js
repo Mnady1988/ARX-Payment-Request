@@ -220,7 +220,8 @@
         g.translate(cv.width / 2 - c.rcx * sc, cv.height / 2 - c.rcy * sc); g.scale(sc, sc); g.rotate(-c.ang); g.translate(-c.cx, -c.cy);
         g.beginPath(); c.P.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.closePath(); g.clip();
         g.drawImage(im, 0, 0);
-        el.src = cv.toDataURL('image/jpeg', 0.9); el.removeAttribute('data-crop'); res();
+        // Put the canvas itself on the page (works when the file is opened locally, where toDataURL is blocked).
+        cv.className = 'uc'; cv.style.cssText = el.style.cssText; el.replaceWith(cv); res();
       };
       im.onerror = res; im.src = c.src;
     }));
@@ -300,7 +301,9 @@
   window.printOffer = async function () {
     if (window.__cropsReady) await window.__cropsReady;
     const pa = $('print-area');
-    pa.innerHTML = $('offer-pages').innerHTML;
+    pa.innerHTML = '';
+    [...$('offer-pages').childNodes].forEach(n => pa.appendChild(n.cloneNode(true)));
+    pa.querySelectorAll('canvas.uc').forEach((c, i) => c.getContext('2d').drawImage($('offer-pages').querySelectorAll('canvas.uc')[i], 0, 0));
     document.body.classList.add('printing-offer');
     if (!$('offer-page-style')) {
       const st = document.createElement('style');

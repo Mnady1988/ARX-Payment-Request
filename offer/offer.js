@@ -268,10 +268,9 @@
           ${row('مقدم التعاقد', p => `${pct(p.r.dp1 + p.r.dp2)} <small>${egp(p.dp)}</small>`)}
           ${row('الأقساط', p => `${p.ins.length} قسط ربع سنوي`)}
           ${row('قيمة القسط', p => egp(p.ins[0] ? p.ins[0].amt : 0), 'hl')}
-          ${row('وديعة الصيانة', p => `${pct(p.r.maint)} <small>${egp(p.maint)}</small>`)}
         </tbody>
       </table>
-      <div class="pp-note">الخصومات بالتتابع: خصم الإطلاق ثم خصم نظام السداد · الأقساط ربع سنوية تبدأ ${esc(P[0].ins[0] ? P[0].ins[0].date : '')} · الأسعار بالجنيه المصري ولا تشمل رسوم التسجيل · وديعة الصيانة على سعر الوحدة</div>
+      <div class="pp-note">الخصومات بالتتابع: خصم الإطلاق ثم خصم نظام السداد · الأقساط ربع سنوية تبدأ ${esc(P[0].ins[0] ? P[0].ins[0].date : '')} · الأسعار بالجنيه المصري ولا تشمل رسوم التسجيل</div>
       <div class="pf pf-dark"><span>ASSL NEW CAIRO <img src="${ARX_LOGO_PDF}" alt=""></span><span>${pn(n)}</span></div>
     </section>`;
   }

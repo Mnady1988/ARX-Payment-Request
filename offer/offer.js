@@ -384,26 +384,43 @@
       return new File([pdf.output('blob')], (document.title || 'Assl Offer').replace(/[\\/:*?"<>|]+/g, '-') + '.pdf', { type: 'application/pdf' });
     } finally { box.remove(); }
   }
+  // One PDF for every device: the file is always built here, never by the browser's print,
+  // so laptop, iPhone and Android all get exactly the same 7 landscape pages.
+  let readyFile = null, readyKey = '';
+  const offerKey = () => document.title + '|' + ($('offer-pages').textContent || '').length;
+  function deliver(file) {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      return navigator.share({ files: [file], title: file.name }).then(() => true, e => {
+        if (e && e.name === 'AbortError') return true;
+        if (e && e.name === 'NotAllowedError') return false;   // took too long after the tap; ask for a second tap
+        download(file); return true;
+      });
+    }
+    download(file); return Promise.resolve(true);
+  }
+  function download(file) {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 60000);
+  }
   window.shareOffer = async function () {
-    const btn = $('offer-share-btn'), label = btn ? btn.innerHTML : '';
+    const btn = $('offer-share-btn'), label = '⤴ Share / Save PDF';
+    if (readyFile && readyKey === offerKey()) {             // second tap: file already built, share right away
+      await deliver(readyFile); readyFile = null; if (btn) btn.innerHTML = label; return;
+    }
     if (btn) { btn.disabled = true; btn.innerHTML = 'Preparing PDF…'; }
     try {
       const file = await buildPdfFile();
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try { await navigator.share({ files: [file], title: file.name }); return; }
-        catch (e) { if (e && e.name === 'AbortError') return; }
-      }
-      const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name;
-      document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+      if (btn) btn.disabled = false;
+      const done = await deliver(file);
+      if (!done) { readyFile = file; readyKey = offerKey(); if (btn) btn.innerHTML = '✓ PDF ready · tap to share'; return; }
+      if (btn) btn.innerHTML = label;
     } catch (e) {
-      alert('Could not create the PDF here (' + (e && e.message ? e.message : e) + '). Use Print / Save as PDF instead.');
-    } finally { if (btn) { btn.disabled = false; btn.innerHTML = label; } }
+      if (btn) { btn.disabled = false; btn.innerHTML = label; }
+      alert('Could not create the PDF (' + (e && e.message ? e.message : e) + '). Check the internet connection and try again.');
+    }
   };
   window.__buildPdfFile = buildPdfFile;
-  // Phones/tablets (iOS Safari especially) ignore the landscape page size when printing and cut the pages,
-  // so on touch devices the offer is only exported through Share PDF.
-  const isTouch = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  if (isTouch) document.documentElement.classList.add('touch-device');
+  window.printOffer = window.shareOffer;
 
   window.addEventListener('afterprint', () => {
     if (document.body.classList.contains('printing-offer')) {

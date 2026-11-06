@@ -311,6 +311,7 @@
     document.title = 'ARX Development — Payment Request v2';
   };
   window.printOffer = async function () {
+    if (document.documentElement.classList.contains('touch-device')) return shareOffer();
     if (window.__cropsReady) await window.__cropsReady;
     const pa = $('print-area');
     pa.innerHTML = '';
@@ -371,6 +372,10 @@
     } finally { if (btn) { btn.disabled = false; btn.innerHTML = label; } }
   };
   window.__buildPdfFile = buildPdfFile;
+  // Phones/tablets (iOS Safari especially) ignore the landscape page size when printing and cut the pages,
+  // so on touch devices the offer is only exported through Share PDF.
+  const isTouch = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (isTouch) document.documentElement.classList.add('touch-device');
 
   window.addEventListener('afterprint', () => {
     if (document.body.classList.contains('printing-offer')) {

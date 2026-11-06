@@ -144,3 +144,7 @@
   body.printing-offer #print-area{display:block!important;}
   body.printing-offer #print-area .op{margin:0;box-shadow:none;}
 }
+
+/* values filled into the pre-made PDF pages */
+.dyn{display:inline-block;text-align:center;white-space:nowrap;}
+.tpl .dyn{color:transparent!important;}

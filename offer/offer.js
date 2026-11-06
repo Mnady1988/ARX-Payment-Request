@@ -334,81 +334,110 @@
     if (document.querySelector(`script[src="${src}"]`)) return res();
     const sc = document.createElement('script'); sc.src = src; sc.onload = res; sc.onerror = () => rej(new Error('Could not load ' + src)); document.head.appendChild(sc);
   });
-  // Each page is drawn by the browser itself (html-to-image, SVG foreignObject), so Arabic text is shaped
-  // and spaced exactly as on screen. html2canvas draws text on its own and overlaps it on iPhone Safari,
-  // so it is only a fallback.
-  const H2I = 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js';
-  const H2C = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+  // Pages are painted onto a canvas by our own code: backgrounds, borders, pictures and text (canvas fillText),
+  // read from the laid-out page. No print, no SVG snapshot, no html2canvas, so laptop, iPhone and Android
+  // all produce the same file.
   const JSPDF = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-  let fontCSS = null;
-  async function getFontCSS() {
-    if (fontCSS !== null) return fontCSS;
-    try { fontCSS = await window.htmlToImage.getFontEmbedCSS(document.body); } catch (e) { fontCSS = ''; }
-    return fontCSS;
-  }
-  // iPhone Safari draws text correctly through html-to-image but drops pictures. So each page is built in layers:
-  // pictures are drawn straight onto a canvas (works on every browser), and only the text/boxes come from html-to-image.
   const imgCache = {};
   const loadImg = src => imgCache[src] || (imgCache[src] = new Promise(res => {
-    const im = new Image(); im.onload = () => (im.decode ? im.decode().catch(() => {}) : Promise.resolve()).then(() => res(im)); im.onerror = () => res(null); im.src = src;
+    const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src;
   }));
-  const bgUrl = el => { const m = /url\(["']?(.*?)["']?\)/.exec(getComputedStyle(el).backgroundImage || ''); return m ? m[1] : null; };
+  const isClear = c => !c || c === 'transparent' || /rgba\([^)]*,\s*0\)$/.test(c);
   const pct = (v, def) => { const m = /(-?[\d.]+)%/.exec(v || ''); return m ? +m[1] / 100 : (/left|top/.test(v) ? 0 : /right|bottom/.test(v) ? 1 : def); };
   function drawFit(g, im, x, y, w, h, mode, px, py) {
-    const iw = im.naturalWidth, ih = im.naturalHeight; if (!iw || !ih) return;
-    if (mode === 'fill' || mode === '100% 100%') return g.drawImage(im, x, y, w, h);
-    const k = mode === 'contain' ? Math.min(w / iw, h / ih) : Math.max(w / iw, h / ih);
-    const dw = iw * k, dh = ih * k;
-    g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
-    g.drawImage(im, x + (w - dw) * px, y + (h - dh) * py, dw, dh); g.restore();
+    const iw = im.naturalWidth || im.width, ih = im.naturalHeight || im.height; if (!iw || !ih || w <= 0 || h <= 0) return;
+    if (mode === 'fill') return g.drawImage(im, x, y, w, h);
+    const k = mode === 'contain' ? Math.min(w / iw, h / ih) : Math.max(w / iw, h / ih), dw = iw * k, dh = ih * k;
+    g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip(); g.drawImage(im, x + (w - dw) * px, y + (h - dh) * py, dw, dh); g.restore();
   }
-  function hasOpaqueAncestor(el, stop) {
-    for (let e = el.parentElement; e && e !== stop; e = e.parentElement) {
-      const c = getComputedStyle(e).backgroundColor; if (c && c !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(c)) return true;
+  function rrect(g, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2); g.beginPath();
+    g.moveTo(x + r, y); g.lineTo(x + w - r, y); g.quadraticCurveTo(x + w, y, x + w, y + r); g.lineTo(x + w, y + h - r);
+    g.quadraticCurveTo(x + w, y + h, x + w - r, y + h); g.lineTo(x + r, y + h); g.quadraticCurveTo(x, y + h, x, y + h - r);
+    g.lineTo(x, y + r); g.quadraticCurveTo(x, y, x + r, y); g.closePath();
+  }
+  function gradient(g, css, x, y, w, h) {
+    const cols = css.match(/rgba?\([^)]*\)|#[0-9a-f]{3,8}/gi); if (!cols || cols.length < 2) return null;
+    const vertical = !/to right|90deg/.test(css), gr = vertical ? g.createLinearGradient(0, y, 0, y + h) : g.createLinearGradient(x, 0, x + w, 0);
+    cols.forEach((c, i) => gr.addColorStop(i / (cols.length - 1), c)); return gr;
+  }
+  async function paintBox(g, el, cs, r) {
+    if (cs.visibility === 'hidden' || cs.display === 'none' || r.width === 0) return;
+    const rad = parseFloat(cs.borderTopLeftRadius) || 0;
+    if (!isClear(cs.backgroundColor)) { g.fillStyle = cs.backgroundColor; rad ? (rrect(g, r.x, r.y, r.w, r.h, rad), g.fill()) : g.fillRect(r.x, r.y, r.w, r.h); }
+    const bi = cs.backgroundImage || 'none';
+    if (/gradient/.test(bi)) { const gr = gradient(g, bi, r.x, r.y, r.w, r.h); if (gr) { g.fillStyle = gr; g.fillRect(r.x, r.y, r.w, r.h); } }
+    const u = /url\(["']?(.*?)["']?\)/.exec(bi);
+    if (u) {
+      const im = await loadImg(u[1]);
+      if (im) { const pos = (cs.backgroundPosition || '50% 50%').split(' '), bs = cs.backgroundSize || '';
+        drawFit(g, im, r.x, r.y, r.w, r.h, /100% 100%/.test(bs) ? 'fill' : bs === 'contain' ? 'contain' : 'cover', pct(pos[0], .5), pct(pos[1] || pos[0], .5)); }
     }
-    return false;
+    const sides = [['Top', 0, 0, r.w, 'h'], ['Bottom', 0, r.h, r.w, 'h'], ['Left', 0, 0, r.h, 'v'], ['Right', r.w, 0, r.h, 'v']];
+    for (const [S, dx, dy, len, o] of sides) {
+      const bw = parseFloat(cs['border' + S + 'Width']) || 0, bc = cs['border' + S + 'Color'];
+      if (!bw || isClear(bc) || cs['border' + S + 'Style'] === 'none') continue;
+      g.fillStyle = bc;
+      if (rad && S === 'Top') { g.lineWidth = bw; g.strokeStyle = bc; rrect(g, r.x + bw / 2, r.y + bw / 2, r.w - bw, r.h - bw, rad); g.stroke(); break; }
+      if (o === 'h') g.fillRect(r.x, r.y + dy - (S === 'Bottom' ? bw : 0), len, bw); else g.fillRect(r.x + dx - (S === 'Right' ? bw : 0), r.y, bw, len);
+    }
   }
-  async function pageLayered(page, w, h) {
-    const S = 2, pr = page.getBoundingClientRect(), under = [], over = [];
-    const rel = r => [r.left - pr.left, r.top - pr.top, r.width, r.height];
-    const pageBg = bgUrl(page);
-    [...page.querySelectorAll('*')].forEach(el => {
-      const u = bgUrl(el); if (!u) return;
-      const cs = getComputedStyle(el), pos = (cs.backgroundPosition || '50% 50%').split(' ');
-      under.push({ src: u, r: rel(el.getBoundingClientRect()), mode: cs.backgroundSize === 'contain' ? 'contain' : (/100% 100%/.test(cs.backgroundSize) ? 'fill' : 'cover'), px: pct(pos[0], .5), py: pct(pos[1] || pos[0], .5), a: 1 });
-      el.style.backgroundImage = 'none'; el.style.backgroundColor = 'transparent';
-    });
-    [...page.querySelectorAll('img')].forEach(el => {
-      const cs = getComputedStyle(el); if (cs.display === 'none' || cs.visibility === 'hidden') return;
-      const item = { src: el.currentSrc || el.src, r: rel(el.getBoundingClientRect()), mode: cs.objectFit === 'contain' ? 'contain' : cs.objectFit === 'cover' ? 'cover' : 'fill', px: .5, py: .5, a: +cs.opacity || 1 };
-      (hasOpaqueAncestor(el, page) ? over : under).push(item);
-      el.style.visibility = 'hidden';
-    });
-    page.style.backgroundImage = 'none'; page.style.backgroundColor = 'transparent';
-    const cv = document.createElement('canvas'); cv.width = Math.round(w * S); cv.height = Math.round(h * S);
-    const g = cv.getContext('2d'); g.scale(S, S); g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
-    const paint = async list => { for (const it of list) { const im = await loadImg(it.src); if (!im) continue; g.globalAlpha = it.a; drawFit(g, im, it.r[0], it.r[1], it.r[2], it.r[3], it.mode, it.px, it.py); g.globalAlpha = 1; } };
-    if (pageBg) { const im = await loadImg(pageBg); if (im) drawFit(g, im, 0, 0, w, h, 'cover', .5, .5); }
-    await paint(under);
-    const opt = { width: w, height: h, pixelRatio: S, cacheBust: false, fontEmbedCSS: await getFontCSS() };
-    let text = await window.htmlToImage.toCanvas(page, opt);
-    if (/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent)) text = await window.htmlToImage.toCanvas(page, opt); // Safari: second pass has the fonts
-    g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(text, 0, 0, cv.width, cv.height); g.scale(S, S);
-    await paint(over);
-    return cv.toDataURL('image/jpeg', 0.86);
+  function paintText(g, node, cs, P) {
+    let text = node.textContent; if (!text.trim()) return;
+    if (cs.textTransform === 'uppercase') text = text.toUpperCase();
+    const font = `${cs.fontStyle === 'italic' ? 'italic ' : ''}${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    g.font = font; g.fillStyle = cs.color; g.textBaseline = 'alphabetic';
+    const ls = parseFloat(cs.letterSpacing) || 0, rtlBlock = cs.direction === 'rtl', arabic = /[؀-ۿ]/;
+    // group characters into visual lines using their layout boxes
+    const rng = document.createRange(), lines = []; let cur = null;
+    for (let i = 0; i < node.length; i++) {
+      rng.setStart(node, i); rng.setEnd(node, i + 1);
+      const rs = rng.getClientRects(); if (!rs.length) continue;
+      const b = rs[0], top = Math.round(b.top);
+      if (!cur || Math.abs(top - cur.top) > b.height * 0.5) { cur = { top, l: b.left, r: b.right, t: b.top, h: b.height, chars: [] }; lines.push(cur); }
+      cur.l = Math.min(cur.l, b.left); cur.r = Math.max(cur.r, b.right); cur.h = Math.max(cur.h, b.height);
+      cur.chars.push({ c: text[i], x: b.left, w: b.width });
+    }
+    for (const ln of lines) {
+      const str = ln.chars.map(c => c.c).join('').replace(/\s+$/, ''), m = g.measureText('Hg');
+      const asc = m.fontBoundingBoxAscent || parseFloat(cs.fontSize) * 0.8, desc = m.fontBoundingBoxDescent || parseFloat(cs.fontSize) * 0.2;
+      const y = ln.t - P.top + (ln.h - asc - desc) / 2 + asc;
+      if (!arabic.test(str) && (ls || !rtlBlock)) {               // latin: put each letter exactly where the page has it
+        g.direction = 'ltr'; g.textAlign = 'left';
+        for (const c of ln.chars) if (c.c.trim()) g.fillText(cs.textTransform === 'uppercase' ? c.c.toUpperCase() : c.c, c.x - P.left, y);
+      } else {                                                    // arabic / mixed: draw the line as one run, browser shapes it
+        g.direction = rtlBlock ? 'rtl' : 'ltr'; g.textAlign = rtlBlock ? 'right' : 'left';
+        g.fillText(str.trim(), (rtlBlock ? ln.r : ln.l) - P.left, y);
+      }
+    }
+  }
+  async function paintNode(g, el, P) {
+    const cs = getComputedStyle(el); if (cs.display === 'none' || cs.visibility === 'hidden') return;
+    const op = parseFloat(cs.opacity); g.save(); if (op < 1) g.globalAlpha *= op;
+    const b = el.getBoundingClientRect(), r = { x: b.left - P.left, y: b.top - P.top, w: b.width, h: b.height };
+    if (el.tagName === 'IMG' || el.tagName === 'CANVAS') {
+      const im = el.tagName === 'CANVAS' ? el : await loadImg(el.currentSrc || el.src);
+      if (im) drawFit(g, im, r.x, r.y, r.w, r.h, cs.objectFit === 'contain' ? 'contain' : cs.objectFit === 'cover' ? 'cover' : 'fill', .5, .5);
+      g.restore(); return;
+    }
+    await paintBox(g, el, cs, r);
+    if (cs.overflow === 'hidden' && el.tagName !== 'SECTION') { g.beginPath(); g.rect(r.x, r.y, r.w, r.h); g.clip(); }
+    for (const ch of el.childNodes) {
+      if (ch.nodeType === 3) paintText(g, ch, cs, P);
+      else if (ch.nodeType === 1) await paintNode(g, ch, P);
+    }
+    g.restore();
   }
   async function pageToJpeg(page, w, h) {
-    if (window.htmlToImage) {
-      try { return await pageLayered(page, w, h); }
-      catch (e) { console.warn('layered render failed, falling back', e); }
-    }
-    await loadScript(H2C);
-    const cv = await html2canvas(page, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
-    return cv.toDataURL('image/jpeg', 0.86);
+    const S = 2, P = page.getBoundingClientRect(), cv = document.createElement('canvas');
+    cv.width = Math.round(w * S); cv.height = Math.round(h * S);
+    const g = cv.getContext('2d'); g.scale(S, S); g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
+    g.beginPath(); g.rect(0, 0, w, h); g.clip();
+    await paintNode(g, page, P);
+    return cv.toDataURL('image/jpeg', 0.88);
   }
   async function buildPdfFile() {
     await loadScript(JSPDF);
-    try { await loadScript(H2I); } catch (e) { /* fallback below */ }
     if (window.__cropsReady) await window.__cropsReady;
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
     const src = $('offer-pages'), box = document.createElement('div');

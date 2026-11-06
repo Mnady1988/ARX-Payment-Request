@@ -334,24 +334,52 @@
     if (document.querySelector(`script[src="${src}"]`)) return res();
     const sc = document.createElement('script'); sc.src = src; sc.onload = res; sc.onerror = () => rej(new Error('Could not load ' + src)); document.head.appendChild(sc);
   });
+  // Each page is drawn by the browser itself (html-to-image, SVG foreignObject), so Arabic text is shaped
+  // and spaced exactly as on screen. html2canvas draws text on its own and overlaps it on iPhone Safari,
+  // so it is only a fallback.
+  const H2I = 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js';
+  const H2C = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+  const JSPDF = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  let fontCSS = null;
+  async function getFontCSS() {
+    if (fontCSS !== null) return fontCSS;
+    try { fontCSS = await window.htmlToImage.getFontEmbedCSS(document.body); } catch (e) { fontCSS = ''; }
+    return fontCSS;
+  }
+  async function pageToJpeg(page, w, h) {
+    if (window.htmlToImage) {
+      try {
+        const opt = { width: w, height: h, pixelRatio: 2, backgroundColor: '#ffffff', quality: 0.86, cacheBust: false, fontEmbedCSS: await getFontCSS() };
+        await window.htmlToImage.toJpeg(page, opt);          // first pass loads images (needed on Safari)
+        return await window.htmlToImage.toJpeg(page, opt);
+      } catch (e) { console.warn('html-to-image failed, falling back', e); }
+    }
+    await loadScript(H2C);
+    const cv = await html2canvas(page, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
+    return cv.toDataURL('image/jpeg', 0.86);
+  }
   async function buildPdfFile() {
-    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
-    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    await loadScript(JSPDF);
+    try { await loadScript(H2I); } catch (e) { /* fallback below */ }
     if (window.__cropsReady) await window.__cropsReady;
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
     const src = $('offer-pages'), box = document.createElement('div');
-    box.style.cssText = 'position:fixed;left:-20000px;top:0;width:297mm;zoom:1;';
+    box.style.cssText = 'position:fixed;left:0;top:0;width:297mm;zoom:1;z-index:-1;pointer-events:none;';
     [...src.children].forEach(n => box.appendChild(n.cloneNode(true)));
     const srcCv = src.querySelectorAll('canvas'), dstCv = box.querySelectorAll('canvas');
     dstCv.forEach((c, i) => { c.width = srcCv[i].width; c.height = srcCv[i].height; c.getContext('2d').drawImage(srcCv[i], 0, 0); });
+    // canvases become images so every renderer copies them reliably
+    dstCv.forEach(c => { try { const im = new Image(); im.src = c.toDataURL('image/jpeg', 0.9); im.className = c.className; im.style.cssText = c.style.cssText; c.replaceWith(im); } catch (e) {} });
     document.body.appendChild(box);
     try {
+      await Promise.all([...box.querySelectorAll('img')].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
       const { jsPDF } = window.jspdf, pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
       const pages = [...box.querySelectorAll('section.op')];
       for (let i = 0; i < pages.length; i++) {
-        const cv = await html2canvas(pages[i], { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
+        const r = pages[i].getBoundingClientRect();
+        const data = await pageToJpeg(pages[i], Math.round(r.width), Math.round(r.height));
         if (i) pdf.addPage('a4', 'landscape');
-        pdf.addImage(cv.toDataURL('image/jpeg', 0.86), 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
+        pdf.addImage(data, 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
       }
       return new File([pdf.output('blob')], (document.title || 'Assl Offer').replace(/[\\/:*?"<>|]+/g, '-') + '.pdf', { type: 'application/pdf' });
     } finally { box.remove(); }

@@ -4,6 +4,7 @@
 (function () {
   const U = window.ASSL_UNITS;
   const IMG = 'offer/img/';
+  const OFFER_VER = '20261106e';
   const $ = id => document.getElementById(id);
   const val = id => ($(id) ? $(id).value.trim() : '');
   const FLOORS = [
@@ -117,7 +118,7 @@
         <div class="cv-line"></div>
         <div class="cv-type">TYPE ${o.type} · ${floorEn(o).toUpperCase()}</div>
         <div class="cv-ar">${o.floor.ar} — نموذج ${o.type} — مبنى ${esc(o.building)}</div>
-        <div class="cv-unit"><span class="cv-unit-ar">الوحدة رقم <b>${o.unit.slice(3)}</b></span><span class="cv-sep"></span><span class="cv-unit-en">UNIT ${o.unit}</span></div>
+        <div class="cv-unit"><span class="cv-unit-ar">الوحدة رقم <b class="dyn" data-k="ap" style="width:1.5em">${o.unit.slice(3)}</b></span><span class="cv-sep"></span><span class="cv-unit-en">UNIT&nbsp;<span class="dyn" data-k="unit" style="width:4.9em">${o.unit}</span></span></div>
       </div>
     </section>`;
   }
@@ -268,22 +269,23 @@
     const P = o.plans.slice().sort((a, b) => (b.years || 0) - (a.years || 0)); // 10, 8, 6 (right → left)
     const launch = Math.max(...P.map(p => p.r.launch || 0));
     const pct = v => (Math.round(v * 1000) / 10) + '%';
-    const row = (label, f, cls = '') => `<tr class="${cls}"><th>${label}</th>${P.map(p => `<td>${f(p)}</td>`).join('')}</tr>`;
+    const row = (label, f, cls = '') => `<tr class="${cls}"><th>${label}</th>${P.map((p, i) => `<td>${f(p, i)}</td>`).join('')}</tr>`;
+    const D = (k, v, w) => `<span class="dyn" data-k="${k}" dir="ltr" style="width:${w}em">${v}</span>`;
     return `<section class="op op-lea" style="background-image:url('${IMG}leather_bg.jpg')">
-      ${launch > 0 ? `<div class="pp-badge">خصم إضافي <span dir="ltr">${pct(launch)}</span> · <b>Launch Offer</b></div>` : ''}
-      <div class="ph ph-dark"><h2>Payment Plans</h2><div class="ph-ar">سعر الوحدة ${egp(o.price)} جنيه · مبنى ${esc(o.building)} · ${o.unit}</div></div>
+      ${launch > 0 ? `<div class="pp-badge">خصم إضافي <span class="dyn" data-k="lb" dir="ltr" style="width:2.6em">${pct(launch)}</span> · <b>Launch Offer</b></div>` : ''}
+      <div class="ph ph-dark"><h2>Payment Plans</h2><div class="ph-ar">سعر الوحدة <span class="dyn" data-k="price" dir="ltr" style="width:5.8em">${egp(o.price)}</span> جنيه · مبنى ${esc(o.building)} · <span class="dyn" data-k="unit" dir="ltr" style="width:3.4em">${o.unit}</span></div></div>
       <table class="pp">
         <thead><tr><th></th>${P.map(p => `<th>${p.years} سنوات</th>`).join('')}</tr></thead>
         <tbody>
-          ${row('خصم نظام السداد', p => p.r.dis > 0 ? p.r.dis + '%' : '—')}
-          ${row('عرض الإطلاق', p => p.r.launch > 0 ? pct(p.r.launch) : '—')}
-          ${row('السعر بعد الخصم', p => egp(p.selling), 'hl')}
-          ${row('مقدم التعاقد', p => `${pct(p.r.dp1 + p.r.dp2)} <small>${egp(p.dp)}</small>`)}
-          ${row('الأقساط', p => `${p.ins.length} قسط ربع سنوي`)}
-          ${row('قيمة القسط', p => egp(p.ins[0] ? p.ins[0].amt : 0), 'hl')}
+          ${row('خصم نظام السداد', (p, i) => D('dis' + i, p.r.dis > 0 ? p.r.dis + '%' : '—', 3.4))}
+          ${row('عرض الإطلاق', (p, i) => D('lau' + i, p.r.launch > 0 ? pct(p.r.launch) : '—', 3.4))}
+          ${row('السعر بعد الخصم', (p, i) => D('sell' + i, egp(p.selling), 6.4), 'hl')}
+          ${row('مقدم التعاقد', (p, i) => `${D('dpp' + i, pct(p.r.dp1 + p.r.dp2), 2.8)} <small>${D('dpa' + i, egp(p.dp), 6.2)}</small>`)}
+          ${row('الأقساط', (p, i) => `${D('insn' + i, p.ins.length, 1.6)} قسط ربع سنوي`)}
+          ${row('قيمة القسط', (p, i) => D('insa' + i, egp(p.ins[0] ? p.ins[0].amt : 0), 6.4), 'hl')}
         </tbody>
       </table>
-      <div class="pp-note">الخصومات بالتتابع: خصم الإطلاق ثم خصم نظام السداد · الأقساط ربع سنوية تبدأ ${esc(P[0].ins[0] ? P[0].ins[0].date : '')} · الأسعار بالجنيه المصري ولا تشمل رسوم التسجيل</div>
+      <div class="pp-note">الخصومات بالتتابع: خصم الإطلاق ثم خصم نظام السداد · الأقساط ربع سنوية · الأسعار بالجنيه المصري ولا تشمل رسوم التسجيل</div>
       <div class="pf pf-dark"><span>ASSL NEW CAIRO <img src="${IMG}arx_dark_bg.png" alt=""></span><span>${pn(n)}</span></div>
     </section>`;
   }
@@ -436,30 +438,54 @@
     await paintNode(g, page, P);
     return cv.toDataURL('image/jpeg', 0.88);
   }
+  // The PDF is assembled from pages pre-rendered once with the laptop's engine (offer/pdf, made by tools/prerender.js).
+  // Only the numbers (unit number, prices, percentages) are written on top, so every device gets the same file.
+  const PDFDIR = 'offer/pdf/';
+  let manifestP = null;
+  const getManifest = () => manifestP || (manifestP = fetch(PDFDIR + 'manifest.json?v=' + OFFER_VER).then(r => r.json()));
+  function offerValues(o) {
+    const P = o.plans.slice().sort((a, b) => (b.years || 0) - (a.years || 0));
+    const pc = v => (Math.round(v * 1000) / 10) + '%', v = { ap: o.unit.slice(3), unit: o.unit, price: egp(o.price) };
+    v.lb = pc(Math.max(...P.map(p => p.r.launch || 0)));
+    P.forEach((p, i) => {
+      v['dis' + i] = p.r.dis > 0 ? p.r.dis + '%' : '—'; v['lau' + i] = p.r.launch > 0 ? pc(p.r.launch) : '—';
+      v['sell' + i] = egp(p.selling); v['dpp' + i] = pc(p.r.dp1 + p.r.dp2); v['dpa' + i] = egp(p.dp);
+      v['insn' + i] = String(p.ins.length); v['insa' + i] = egp(p.ins[0] ? p.ins[0].amt : 0);
+    });
+    return v;
+  }
+  function drawValue(g, d, text) {
+    g.font = d.font; g.fillStyle = d.color; g.textBaseline = 'alphabetic'; g.direction = 'ltr';
+    const chars = [...text], ws = chars.map(c => g.measureText(c).width), total = ws.reduce((a, b) => a + b, 0) + d.ls * (chars.length - 1);
+    let x = d.x + (d.w - total) / 2; const y = d.y + d.h * (/Cinzel/.test(d.font) ? 0.74 : 0.765);
+    if (!d.ls) { g.textAlign = 'center'; g.fillText(text, d.x + d.w / 2, y); return; }
+    g.textAlign = 'left'; chars.forEach((c, i) => { g.fillText(c, x, y); x += ws[i] + d.ls; });
+  }
   async function buildPdfFile() {
+    const o = getOffer(); if (!o || o.error) throw new Error(o ? o.error : 'Fill in the unit and price first');
     await loadScript(JSPDF);
-    if (window.__cropsReady) await window.__cropsReady;
-    if (document.fonts && document.fonts.ready) await document.fonts.ready;
-    const src = $('offer-pages'), box = document.createElement('div');
-    box.style.cssText = 'position:fixed;left:0;top:0;width:297mm;zoom:1;z-index:-1;pointer-events:none;';
-    [...src.children].forEach(n => box.appendChild(n.cloneNode(true)));
-    const srcCv = src.querySelectorAll('canvas'), dstCv = box.querySelectorAll('canvas');
-    dstCv.forEach((c, i) => { c.width = srcCv[i].width; c.height = srcCv[i].height; c.getContext('2d').drawImage(srcCv[i], 0, 0); });
-    // canvases become images so every renderer copies them reliably
-    dstCv.forEach(c => { try { const im = new Image(); im.src = c.toDataURL('image/jpeg', 0.9); im.className = c.className; im.style.cssText = c.style.cssText; c.replaceWith(im); } catch (e) {} });
-    document.body.appendChild(box);
-    try {
-      await Promise.all([...box.querySelectorAll('img')].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
-      const { jsPDF } = window.jspdf, pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
-      const pages = [...box.querySelectorAll('section.op')];
-      for (let i = 0; i < pages.length; i++) {
-        const r = pages[i].getBoundingClientRect();
-        const data = await pageToJpeg(pages[i], Math.round(r.width), Math.round(r.height));
-        if (i) pdf.addPage('a4', 'landscape');
-        pdf.addImage(data, 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
-      }
-      return new File([pdf.output('blob')], (document.title || 'Assl Offer').replace(/[\\/:*?"<>|]+/g, '-') + '.pdf', { type: 'application/pdf' });
-    } finally { box.remove(); }
+    const M = await getManifest(), fl = o.ground ? 'G' : 'T', ap = o.unit.slice(3), floorKey = o.floor.v;
+    const names = [`cover_${o.building}_${floorKey}.jpg`, 'life.jpg', 'location.jpg', `mp_${o.building}.jpg`,
+      `floor_${o.type}_${fl}_${ap}.jpg`, `unit_${o.type}_${fl}_${ap}.jpg`, `pay_${o.building}.jpg`];
+    const vals = offerValues(o);
+    const fonts = new Set(); names.forEach(n => (M.pages[n] || []).forEach(d => fonts.add(d.font)));
+    if (document.fonts) await Promise.all([...fonts].map(f => document.fonts.load(f).catch(() => {})));
+    const { jsPDF } = window.jspdf, pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
+    const imgs = await Promise.all(names.map(n => loadImg(PDFDIR + n + '?v=' + OFFER_VER)));
+    for (let i = 0; i < names.length; i++) {
+      const im = imgs[i]; if (!im) throw new Error('Missing page ' + names[i]);
+      let data;
+      const dyn = M.pages[names[i]];
+      if (dyn) {
+        const cv = document.createElement('canvas'); cv.width = im.naturalWidth; cv.height = im.naturalHeight;
+        const g = cv.getContext('2d'); g.drawImage(im, 0, 0); g.scale(cv.width / M.w, cv.height / M.h);
+        dyn.forEach(d => { if (vals[d.k] != null) drawValue(g, d, String(vals[d.k])); });
+        data = cv.toDataURL('image/jpeg', 0.9);
+      } else data = im;
+      if (i) pdf.addPage('a4', 'landscape');
+      pdf.addImage(data, 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
+    }
+    return new File([pdf.output('blob')], `Assl Offer ${o.building} ${o.unit}.pdf`, { type: 'application/pdf' });
   }
   // One PDF for every device: the file is always built here, never by the browser's print,
   // so laptop, iPhone and Android all get exactly the same 7 landscape pages.

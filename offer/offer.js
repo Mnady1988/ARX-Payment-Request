@@ -346,13 +346,61 @@
     try { fontCSS = await window.htmlToImage.getFontEmbedCSS(document.body); } catch (e) { fontCSS = ''; }
     return fontCSS;
   }
+  // iPhone Safari draws text correctly through html-to-image but drops pictures. So each page is built in layers:
+  // pictures are drawn straight onto a canvas (works on every browser), and only the text/boxes come from html-to-image.
+  const imgCache = {};
+  const loadImg = src => imgCache[src] || (imgCache[src] = new Promise(res => {
+    const im = new Image(); im.onload = () => (im.decode ? im.decode().catch(() => {}) : Promise.resolve()).then(() => res(im)); im.onerror = () => res(null); im.src = src;
+  }));
+  const bgUrl = el => { const m = /url\(["']?(.*?)["']?\)/.exec(getComputedStyle(el).backgroundImage || ''); return m ? m[1] : null; };
+  const pct = (v, def) => { const m = /(-?[\d.]+)%/.exec(v || ''); return m ? +m[1] / 100 : (/left|top/.test(v) ? 0 : /right|bottom/.test(v) ? 1 : def); };
+  function drawFit(g, im, x, y, w, h, mode, px, py) {
+    const iw = im.naturalWidth, ih = im.naturalHeight; if (!iw || !ih) return;
+    if (mode === 'fill' || mode === '100% 100%') return g.drawImage(im, x, y, w, h);
+    const k = mode === 'contain' ? Math.min(w / iw, h / ih) : Math.max(w / iw, h / ih);
+    const dw = iw * k, dh = ih * k;
+    g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
+    g.drawImage(im, x + (w - dw) * px, y + (h - dh) * py, dw, dh); g.restore();
+  }
+  function hasOpaqueAncestor(el, stop) {
+    for (let e = el.parentElement; e && e !== stop; e = e.parentElement) {
+      const c = getComputedStyle(e).backgroundColor; if (c && c !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(c)) return true;
+    }
+    return false;
+  }
+  async function pageLayered(page, w, h) {
+    const S = 2, pr = page.getBoundingClientRect(), under = [], over = [];
+    const rel = r => [r.left - pr.left, r.top - pr.top, r.width, r.height];
+    const pageBg = bgUrl(page);
+    [...page.querySelectorAll('*')].forEach(el => {
+      const u = bgUrl(el); if (!u) return;
+      const cs = getComputedStyle(el), pos = (cs.backgroundPosition || '50% 50%').split(' ');
+      under.push({ src: u, r: rel(el.getBoundingClientRect()), mode: cs.backgroundSize === 'contain' ? 'contain' : (/100% 100%/.test(cs.backgroundSize) ? 'fill' : 'cover'), px: pct(pos[0], .5), py: pct(pos[1] || pos[0], .5), a: 1 });
+      el.style.backgroundImage = 'none'; el.style.backgroundColor = 'transparent';
+    });
+    [...page.querySelectorAll('img')].forEach(el => {
+      const cs = getComputedStyle(el); if (cs.display === 'none' || cs.visibility === 'hidden') return;
+      const item = { src: el.currentSrc || el.src, r: rel(el.getBoundingClientRect()), mode: cs.objectFit === 'contain' ? 'contain' : cs.objectFit === 'cover' ? 'cover' : 'fill', px: .5, py: .5, a: +cs.opacity || 1 };
+      (hasOpaqueAncestor(el, page) ? over : under).push(item);
+      el.style.visibility = 'hidden';
+    });
+    page.style.backgroundImage = 'none'; page.style.backgroundColor = 'transparent';
+    const cv = document.createElement('canvas'); cv.width = Math.round(w * S); cv.height = Math.round(h * S);
+    const g = cv.getContext('2d'); g.scale(S, S); g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
+    const paint = async list => { for (const it of list) { const im = await loadImg(it.src); if (!im) continue; g.globalAlpha = it.a; drawFit(g, im, it.r[0], it.r[1], it.r[2], it.r[3], it.mode, it.px, it.py); g.globalAlpha = 1; } };
+    if (pageBg) { const im = await loadImg(pageBg); if (im) drawFit(g, im, 0, 0, w, h, 'cover', .5, .5); }
+    await paint(under);
+    const opt = { width: w, height: h, pixelRatio: S, cacheBust: false, fontEmbedCSS: await getFontCSS() };
+    let text = await window.htmlToImage.toCanvas(page, opt);
+    if (/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent)) text = await window.htmlToImage.toCanvas(page, opt); // Safari: second pass has the fonts
+    g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(text, 0, 0, cv.width, cv.height); g.scale(S, S);
+    await paint(over);
+    return cv.toDataURL('image/jpeg', 0.86);
+  }
   async function pageToJpeg(page, w, h) {
     if (window.htmlToImage) {
-      try {
-        const opt = { width: w, height: h, pixelRatio: 2, backgroundColor: '#ffffff', quality: 0.86, cacheBust: false, fontEmbedCSS: await getFontCSS() };
-        await window.htmlToImage.toJpeg(page, opt);          // first pass loads images (needed on Safari)
-        return await window.htmlToImage.toJpeg(page, opt);
-      } catch (e) { console.warn('html-to-image failed, falling back', e); }
+      try { return await pageLayered(page, w, h); }
+      catch (e) { console.warn('layered render failed, falling back', e); }
     }
     await loadScript(H2C);
     const cv = await html2canvas(page, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });

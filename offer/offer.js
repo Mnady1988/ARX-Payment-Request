@@ -167,11 +167,9 @@
     const poly = ((window.ASSL_UNIT_POLY || {})[`${type}-${fl}`] || {})[apn];
     const src = alt ? `${IMG}${alt.img}` : `${IMG}furn_${type}_${fl}.jpg`;
     if (!poly) return `<img src="${src}" alt="">`;
-    const clip = poly.map(p => `${(p[0] * 100).toFixed(2)}% ${(p[1] * 100).toFixed(2)}%`).join(',');
-    const pts = poly.map(p => `${(p[0] * sz[0]).toFixed(1)},${(p[1] * sz[1]).toFixed(1)}`).join(' ');
-    return `<div class="stage" style="${box ? fitBox(sz[0], sz[1], box[0], box[1]) : `aspect-ratio:${sz[0]}/${sz[1]}`}">
-      <img class="st-dim" src="${src}" alt=""><img class="st-unit" src="${src}" alt="" style="clip-path:polygon(${clip})">
-      <svg viewBox="0 0 ${sz[0]} ${sz[1]}" preserveAspectRatio="none"><polygon points="${pts}"/></svg></div>`;
+    // Drawn into a canvas after render (renderCrops), so it prints and exports to PDF the same way.
+    const spec = { src, poly, sz };
+    return `<img class="stage-c" alt="" data-stage='${JSON.stringify(spec)}' style="${box ? fitBox(sz[0], sz[1], box[0], box[1]) : ''}">`;
   }
 
   function floorPage(o, n) {
@@ -225,7 +223,22 @@
       };
       im.onerror = res; im.src = c.src;
     }));
-    return Promise.all(jobs);
+    const stages = [...root.querySelectorAll('img[data-stage]')].map(el => new Promise(res => {
+      const c = JSON.parse(el.dataset.stage), im = new Image();
+      im.onload = () => {
+        const [W, H] = c.sz, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+        const g = cv.getContext('2d'), P = c.poly.map(p => [p[0] * W, p[1] * H]);
+        const path = () => { g.beginPath(); P.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.closePath(); };
+        g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+        g.save(); g.globalAlpha = 0.22; g.filter = 'grayscale(50%)'; g.drawImage(im, 0, 0, W, H); g.restore();
+        g.save(); path(); g.clip(); g.drawImage(im, 0, 0, W, H); g.restore();
+        g.save(); path(); g.strokeStyle = '#C9A24A'; g.lineWidth = Math.max(W, H) / 160; g.lineJoin = 'round';
+        g.shadowColor = 'rgba(201,162,74,.9)'; g.shadowBlur = Math.max(W, H) / 120; g.stroke(); g.restore();
+        cv.className = 'stage-c'; cv.style.cssText = el.style.cssText; el.replaceWith(cv); res();
+      };
+      im.onerror = res; im.src = c.src;
+    }));
+    return Promise.all(jobs.concat(stages));
   }
 
   function unitPage(o, n) {
@@ -271,7 +284,7 @@
         </tbody>
       </table>
       <div class="pp-note">الخصومات بالتتابع: خصم الإطلاق ثم خصم نظام السداد · الأقساط ربع سنوية تبدأ ${esc(P[0].ins[0] ? P[0].ins[0].date : '')} · الأسعار بالجنيه المصري ولا تشمل رسوم التسجيل</div>
-      <div class="pf pf-dark"><span>ASSL NEW CAIRO <img src="${ARX_LOGO_PDF}" alt=""></span><span>${pn(n)}</span></div>
+      <div class="pf pf-dark"><span>ASSL NEW CAIRO <img src="${IMG}arx_dark_bg.png" alt=""></span><span>${pn(n)}</span></div>
     </section>`;
   }
 
@@ -291,13 +304,14 @@
     $('offer-preview').classList.add('show');
     $('offer-preview').scrollTop = 0;
     fitOffer();
-    document.title = `Offer ${o.building} ${o.unit}${o.client ? ' - ' + o.client : ''}`;
+    document.title = `Assl Offer ${o.building} ${o.unit}`;
   };
   window.closeOffer = function () {
     $('offer-preview').classList.remove('show');
     document.title = 'ARX Development — Payment Request v2';
   };
   window.printOffer = async function () {
+    if (document.documentElement.classList.contains('touch-device')) return shareOffer();
     if (window.__cropsReady) await window.__cropsReady;
     const pa = $('print-area');
     pa.innerHTML = '';
@@ -315,6 +329,54 @@
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
     window.print();
   };
+  // ── share / download a real PDF file ──
+  const loadScript = src => new Promise((res, rej) => {
+    if (document.querySelector(`script[src="${src}"]`)) return res();
+    const sc = document.createElement('script'); sc.src = src; sc.onload = res; sc.onerror = () => rej(new Error('Could not load ' + src)); document.head.appendChild(sc);
+  });
+  async function buildPdfFile() {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    if (window.__cropsReady) await window.__cropsReady;
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const src = $('offer-pages'), box = document.createElement('div');
+    box.style.cssText = 'position:fixed;left:-20000px;top:0;width:297mm;zoom:1;';
+    [...src.children].forEach(n => box.appendChild(n.cloneNode(true)));
+    const srcCv = src.querySelectorAll('canvas'), dstCv = box.querySelectorAll('canvas');
+    dstCv.forEach((c, i) => { c.width = srcCv[i].width; c.height = srcCv[i].height; c.getContext('2d').drawImage(srcCv[i], 0, 0); });
+    document.body.appendChild(box);
+    try {
+      const { jsPDF } = window.jspdf, pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
+      const pages = [...box.querySelectorAll('section.op')];
+      for (let i = 0; i < pages.length; i++) {
+        const cv = await html2canvas(pages[i], { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
+        if (i) pdf.addPage('a4', 'landscape');
+        pdf.addImage(cv.toDataURL('image/jpeg', 0.86), 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
+      }
+      return new File([pdf.output('blob')], (document.title || 'Assl Offer').replace(/[\\/:*?"<>|]+/g, '-') + '.pdf', { type: 'application/pdf' });
+    } finally { box.remove(); }
+  }
+  window.shareOffer = async function () {
+    const btn = $('offer-share-btn'), label = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = 'Preparing PDF…'; }
+    try {
+      const file = await buildPdfFile();
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file], title: file.name }); return; }
+        catch (e) { if (e && e.name === 'AbortError') return; }
+      }
+      const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name;
+      document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+    } catch (e) {
+      alert('Could not create the PDF here (' + (e && e.message ? e.message : e) + '). Use Print / Save as PDF instead.');
+    } finally { if (btn) { btn.disabled = false; btn.innerHTML = label; } }
+  };
+  window.__buildPdfFile = buildPdfFile;
+  // Phones/tablets (iOS Safari especially) ignore the landscape page size when printing and cut the pages,
+  // so on touch devices the offer is only exported through Share PDF.
+  const isTouch = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (isTouch) document.documentElement.classList.add('touch-device');
+
   window.addEventListener('afterprint', () => {
     if (document.body.classList.contains('printing-offer')) {
       document.body.classList.remove('printing-offer');

@@ -213,7 +213,8 @@ window.addEventListener('DOMContentLoaded', function() {
 <div id="offer-preview">
   <div class="offer-bar">
     <button class="b-close" onclick="closeOffer()">✕ Close</button>
-    <button class="b-print" onclick="printOffer()">⬇ Save as PDF</button>
+    <button class="b-ghost" onclick="printOffer()">🖨 Print</button>
+    <button class="b-print" id="offer-share-btn" onclick="shareOffer()">⤴ Share PDF</button>
   </div>
   <div id="offer-pages"></div>
 </div>

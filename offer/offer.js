@@ -4,7 +4,7 @@
 (function () {
   const U = window.ASSL_UNITS;
   const IMG = 'offer/img/';
-  const OFFER_VER = '20261107b';
+  const OFFER_VER = '20261107c';
   const $ = id => document.getElementById(id);
   const val = id => ($(id) ? $(id).value.trim() : '');
   const FLOORS = [
@@ -123,11 +123,11 @@
     </section>`;
   }
   function lifePage(n) {
-    const smalls = [['life_gate.jpg', 'البوابة الرئيسية'], ['life_pool.jpg', 'حمام السباحة'], ['life_garden.jpg', 'حدائق خاصة'], ['life_kids.jpg', 'منطقة الأطفال']];
+    const smalls = [['life_a1.jpg', 'عمارات أصل'], ['life_gate.jpg', 'البوابة الرئيسية'], ['life_pool.jpg', 'حمام السباحة'], ['life_garden.jpg', 'حدائق خاصة']];
     const fig = (f, cap, cls = '') => `<figure class="lf ${cls}" style="background-image:url('${IMG}${f}')"><figcaption>${cap}</figcaption></figure>`;
     return `<section class="op op-paper" style="background-image:url('${IMG}paper.jpg')">
-      <div class="ph"><h2>Life at Assl</h2><div class="ph-ar">العمارات · البوابة · حمام السباحة · الحدائق · منطقة الأطفال</div></div>
-      <div class="lf-wrap">${fig('life_a1.jpg', 'عمارات أصل · Type A', 'lf-hero')}<div class="lf-grid">${smalls.map(x => fig(x[0], x[1])).join('')}</div></div>
+      <div class="ph"><h2>Life at Assl</h2><div class="ph-ar">اللاجون · العمارات · البوابة · حمام السباحة · الحدائق</div></div>
+      <div class="lf-wrap">${fig('life_lagoon.jpg', 'أصل نيو كايرو', 'lf-hero')}<div class="lf-grid">${smalls.map(x => fig(x[0], x[1])).join('')}</div></div>
       ${paperFoot(n)}</section>`;
   }
   function locationPage(n) {

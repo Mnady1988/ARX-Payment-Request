@@ -4,7 +4,7 @@
 (function () {
   const U = window.ASSL_UNITS;
   const IMG = 'offer/img/';
-  const OFFER_VER = '20261106e';
+  const OFFER_VER = '20261107a';
   const $ = id => document.getElementById(id);
   const val = id => ($(id) ? $(id).value.trim() : '');
   const FLOORS = [
@@ -277,10 +277,11 @@
       <table class="pp">
         <thead><tr><th></th>${P.map(p => `<th>${p.years} سنوات</th>`).join('')}</tr></thead>
         <tbody>
+          ${row('السعر قبل الخصم', (p, i) => D('orig' + i, egp(o.price), 6.4), 'orig')}
           ${row('خصم نظام السداد', (p, i) => D('dis' + i, p.r.dis > 0 ? p.r.dis + '%' : '—', 3.4))}
           ${row('عرض الإطلاق', (p, i) => D('lau' + i, p.r.launch > 0 ? pct(p.r.launch) : '—', 3.4))}
           ${row('السعر بعد الخصم', (p, i) => D('sell' + i, egp(p.selling), 6.4), 'hl')}
-          ${row('مقدم التعاقد', (p, i) => `${D('dpp' + i, pct(p.r.dp1 + p.r.dp2), 2.8)} <small>${D('dpa' + i, egp(p.dp), 6.2)}</small>`)}
+          ${row('مقدم التعاقد', (p, i) => `${D('dpp' + i, pct(p.r.dp1 + p.r.dp2), 2.8)} <small>${D('dpa' + i, egp(p.dp), 6.2)}</small>`, 'dp')}
           ${row('الأقساط', (p, i) => `${D('insn' + i, p.ins.length, 1.6)} قسط ربع سنوي`)}
           ${row('قيمة القسط', (p, i) => D('insa' + i, egp(p.ins[0] ? p.ins[0].amt : 0), 6.4), 'hl')}
         </tbody>
@@ -449,7 +450,7 @@
     v.lb = pc(Math.max(...P.map(p => p.r.launch || 0)));
     P.forEach((p, i) => {
       v['dis' + i] = p.r.dis > 0 ? p.r.dis + '%' : '—'; v['lau' + i] = p.r.launch > 0 ? pc(p.r.launch) : '—';
-      v['sell' + i] = egp(p.selling); v['dpp' + i] = pc(p.r.dp1 + p.r.dp2); v['dpa' + i] = egp(p.dp);
+      v['orig' + i] = egp(o.price); v['sell' + i] = egp(p.selling); v['dpp' + i] = pc(p.r.dp1 + p.r.dp2); v['dpa' + i] = egp(p.dp);
       v['insn' + i] = String(p.ins.length); v['insa' + i] = egp(p.ins[0] ? p.ins[0].amt : 0);
     });
     return v;

@@ -4,7 +4,7 @@
 (function () {
   const U = window.ASSL_UNITS;
   const IMG = 'offer/img/';
-  const OFFER_VER = '20261107a';
+  const OFFER_VER = '20261107b';
   const $ = id => document.getElementById(id);
   const val = id => ($(id) ? $(id).value.trim() : '');
   const FLOORS = [
@@ -278,8 +278,8 @@
         <thead><tr><th></th>${P.map(p => `<th>${p.years} سنوات</th>`).join('')}</tr></thead>
         <tbody>
           ${row('السعر قبل الخصم', (p, i) => D('orig' + i, egp(o.price), 6.4), 'orig')}
-          ${row('خصم نظام السداد', (p, i) => D('dis' + i, p.r.dis > 0 ? p.r.dis + '%' : '—', 3.4))}
           ${row('عرض الإطلاق', (p, i) => D('lau' + i, p.r.launch > 0 ? pct(p.r.launch) : '—', 3.4))}
+          ${row('خصم نظام السداد', (p, i) => D('dis' + i, p.r.dis > 0 ? p.r.dis + '%' : '—', 3.4))}
           ${row('السعر بعد الخصم', (p, i) => D('sell' + i, egp(p.selling), 6.4), 'hl')}
           ${row('مقدم التعاقد', (p, i) => `${D('dpp' + i, pct(p.r.dp1 + p.r.dp2), 2.8)} <small>${D('dpa' + i, egp(p.dp), 6.2)}</small>`, 'dp')}
           ${row('الأقساط', (p, i) => `${D('insn' + i, p.ins.length, 1.6)} قسط ربع سنوي`)}

@@ -4,7 +4,7 @@
 (function () {
   const U = window.ASSL_UNITS;
   const IMG = 'offer/img/';
-  const OFFER_VER = '20261107c';
+  const OFFER_VER = '20261109a';
   const $ = id => document.getElementById(id);
   const val = id => ($(id) ? $(id).value.trim() : '');
   const FLOORS = [

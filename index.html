@@ -537,7 +537,7 @@ function getOrderData() {
   const adminAmt = r.adminFees > 0 ? Math.round(sp * r.adminFees) : 0;
   const sellingRounded = Math.round(pr * (1 - (r.launch || 0)) * (1 - r.dis / 100));
   const schedTotal = sellingRounded - adminAmt;
-  return { project: p, type: t, systemPrice: pr, sellingPrice: sp, adminAmt, schedTotal, r };
+  return { project: p, type: t, systemPrice: pr, sellingPrice: sellingRounded, adminAmt, schedTotal, r };
 }
 
 function handleConfirm() {

@@ -157,7 +157,7 @@ window.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="field">
         <label>System price</label>
-        <div class="input-wrap"><span class="prefix">$</span><input type="number" id="price" placeholder="0.00" min="0" step="0.01" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/(\..*)\./g,'$1'); updatePrices()"/></div>
+        <div class="input-wrap"><span class="prefix">$</span><input type="text" id="price" placeholder="0.00" inputmode="decimal" oninput="formatPriceInput(this); updatePrices()"/></div>
       </div>
       <div class="field">
         <label>Selling price <span id="badge" style="display:none;"></span></label>
@@ -475,8 +475,24 @@ function onPaymentChange() {
 
 function fmtN(n) { return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
+function formatPriceInput(el) {
+  let raw = el.value.replace(/,/g, '');
+  raw = raw.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+  const parts = raw.split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const cursor = el.selectionStart;
+  const oldLen = el.value.length;
+  el.value = parts.length > 1 ? parts[0] + '.' + parts[1] : parts[0];
+  const newLen = el.value.length;
+  el.setSelectionRange(cursor + (newLen - oldLen), cursor + (newLen - oldLen));
+}
+
+function getPriceValue() {
+  return parseFloat(document.getElementById('price').value.replace(/,/g, '')) || 0;
+}
+
 function updatePrices() {
-  const pr = parseFloat(document.getElementById('price').value);
+  const pr = getPriceValue();
   if (!isNaN(pr) && CR) {
     // Apply Launch Offer first, then Dis/intr on the result
     const afterLaunch = pr * (1 - (CR.launch || 0));
@@ -497,7 +513,7 @@ function updatePrices() {
 
 function updateSummary() {
   const p = document.getElementById('project').value, t = document.getElementById('payment').value;
-  const pr = parseFloat(document.getElementById('price').value), sp = document.getElementById('selling').value;
+  const pr = getPriceValue(), sp = document.getElementById('selling').value;
   const sum = document.getElementById('summary');
   if (p || t || !isNaN(pr)) {
     sum.style.display = 'block';
@@ -515,7 +531,7 @@ function updateSummary() {
 
 function getOrderData() {
   const p = document.getElementById('project').value, t = document.getElementById('payment').value;
-  const pr = parseFloat(document.getElementById('price').value), sp = parseFloat(document.getElementById('selling').value);
+  const pr = getPriceValue(), sp = parseFloat(document.getElementById('selling').value);
   if (!p || !t || isNaN(pr) || pr <= 0) return null;
   const r = CR;
   const adminAmt = r.adminFees > 0 ? Math.round(sp * r.adminFees) : 0;

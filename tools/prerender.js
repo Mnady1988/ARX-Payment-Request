@@ -1,10 +1,12 @@
 // Pre-renders every offer page as an image (same Chromium engine as the laptop) so the PDF is identical on all devices.
 // Usage: serve the repo on http://localhost:8765, then: node tools/prerender.js
 // Re-run whenever unit data, images or page design change.
+// ONLY=<building> (e.g. ONLY="E'1-2") renders just that building's cover, masterplan and payment pages — use it after adding a building.
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path');
 const OUT = path.join(__dirname, '..', 'offer', 'pdf');
 const SCALE = 1.5, Q = 80;
+const ONLY = process.env.ONLY || '';
 const FONTS = process.env.FONT_CSS ? fs.readFileSync(process.env.FONT_CSS) : null;
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
@@ -49,14 +51,16 @@ const FONTS = process.env.FONT_CSS ? fs.readFileSync(process.env.FONT_CSS) : nul
   }
   const floors = ['G', '1', '2', '3', '4', '5', '6'];
   for (const [t, d] of Object.entries(U)) {
+    if (ONLY && !d.buildings.includes(ONLY)) continue;
     for (const bd of d.buildings) {
+      if (ONLY && bd !== ONLY) continue;
       for (const fl of floors) {
         await make(t, bd, fl, 0);
         await shot(0, `cover_${bd}_${fl}.jpg`);
         if (fl === 'G') { await shot(1, 'life.jpg'); await shot(2, 'location.jpg'); await shot(3, `mp_${bd}.jpg`); await shot(6, `pay_${bd}.jpg`); }
       }
     }
-    for (const fl of ['G', '1']) {
+    for (const fl of ONLY ? [] : ['G', '1']) {
       const n = d[fl === 'G' ? 'G' : 'T'].length, gt = fl === 'G' ? 'G' : 'T';
       for (let a = 0; a < n; a++) {
         await make(t, d.buildings[0], fl, a);

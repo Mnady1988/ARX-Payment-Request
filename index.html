@@ -563,6 +563,13 @@ function addQtrs(s, n) {
   return `${String(d).padStart(2,'0')}-${MN[m]}-${String(y).slice(-2)}`;
 }
 function fmtP(n, base) { return ((n / base) * 100).toFixed(3) + '%'; }
+// "26-Nov-26" / "26-Feb-2027" → sortable number (NaN when it isn't a date)
+function dateKey(s) {
+  const pts = (s || '').split('-');
+  if (pts.length < 3 || !MO[pts[1]]) return NaN;
+  let y = parseInt(pts[2]); if (y < 100) y += 2000;
+  return y * 10000 + MO[pts[1]] * 100 + parseInt(pts[0]);
+}
 
 function buildSchedule(d) {
   const { systemPrice, sellingPrice, adminAmt, schedTotal, r } = d;
@@ -570,23 +577,34 @@ function buildSchedule(d) {
   const base = isStoda ? schedTotal : sellingPrice;
   const dp1Amt = Math.round(base * r.dp1);
   const dp2Amt = Math.round(base * r.dp2);
-  const insAmt = Math.round(base * r.insPct);
+  const insPct = r.insPct;
+  const insAmt = Math.round(base * insPct);
   const insN = r.insN;
-  const allocated = dp1Amt + dp2Amt + insAmt * insN;
+  const bulletN = r.bulletPct > 0 ? (r.bulletN || 0) : 0;
+  const bulletAmt = Math.round(base * r.bulletPct);
+  const allocated = dp1Amt + dp2Amt + bulletAmt * bulletN + insAmt * insN;
   const lastAmt = insAmt + (Math.round(base) - allocated);
   const maintAmt  = Math.round(systemPrice * r.maint);
   const maint2Amt = r.maint2 > 0 ? Math.round(systemPrice * r.maint2) : 0;
   const opsAmt = r.opsFees > 0 ? Math.round(systemPrice * r.opsFees) : 0;
   const rows = [];
-  rows.push({ desc: 'DP-1', pct: fmtP(dp1Amt, base), amt: dp1Amt, date: r.dp1d, active: true });
+  if (dp1Amt > 0) rows.push({ desc: 'DP-1', pct: fmtP(dp1Amt, base), amt: dp1Amt, date: r.dp1d, active: true }); // zero down payment → no row
   if (dp2Amt > 0) rows.push({ desc: 'DP-2', pct: fmtP(dp2Amt, base), amt: dp2Amt, date: r.dp2d, active: true });
-  if (insN > 0 && r.insPct > 0) {
+  if (insN > 0 && insPct > 0) {
     for (let i = 1; i <= insN; i++) {
       const a = i === insN ? lastAmt : insAmt;
       // INS dates start from 1st ins date (col W), each quarter apart
       const insStartDate = r.insDate || r.dp1d;
       rows.push({ desc: `INS-${i}`, pct: fmtP(a, base), amt: a, date: addQtrs(insStartDate, i - 1), active: true });
     }
+  }
+  // Bullets: the first is due one year after the down payment date, the next ones a year apart;
+  // each one goes right after the last payment dated on or before it
+  for (let k = 1; k <= bulletN; k++) {
+    const date = addQtrs(r.dp1d, 4 * k), key = dateKey(date);
+    let at = rows.length;
+    if (!isNaN(key)) { at = 0; rows.forEach((x, j) => { if (dateKey(x.date) <= key) at = j + 1; }); }
+    rows.splice(at, 0, { desc: `Bullet-${k}`, pct: fmtP(bulletAmt, base), amt: bulletAmt, date, active: true });
   }
   return { rows, maintAmt, maint2Amt, opsAmt, base, isStoda, adminAmt, r, systemPrice };
 }
@@ -620,11 +638,11 @@ function buildPdfHtml(d) {
     } else if (isIns && insCountSoFar % 4 === 0) {
       // start of a new year group
       const yr = Math.floor(insCountSoFar / 4) + 1;
-      // rowspan = number of rows until next year group (up to 4 INS rows)
+      // rowspan = rows until the next year's first installment (4 INS rows, plus any bullet between them)
       let span = 0, insInGroup = 0;
-      for (let j = i; j < s.rows.length && insInGroup < 4; j++) {
+      for (let j = i; j < s.rows.length; j++) {
+        if (s.rows[j].desc.startsWith('INS-')) { if (insInGroup === 4) break; insInGroup++; }
         span++;
-        if (s.rows[j].desc.startsWith('INS-')) insInGroup++;
       }
       yearCellHtml = `<td class="ph-yc" rowspan="${span}">Year ${yr}</td>`;
       insCountSoFar++;
@@ -711,9 +729,10 @@ function exportExcel() {
   ws.push([]); ws.push(['النسبة','القسط','البنك','رقم الشيك','الوصف','التاريخ','Year']);
   const yearFrom = d.r.yearFrom || 'DP-2';
   const yearStartIdx = yearFrom === 'DP-1' ? 0 : yearFrom === 'DP-2' ? 1 : 2;
-  s.rows.forEach((row, i) => {
-    const pos = i - yearStartIdx;
-    const yr = pos >= 0 ? `Year ${Math.floor(pos / 4) + 1}` : '';
+  let pos = -yearStartIdx, yr = '';
+  s.rows.forEach(row => {
+    // a bullet takes the year of the payment before it and doesn't shift the quarter count
+    if (!row.desc.startsWith('Bullet')) { yr = pos >= 0 ? `Year ${Math.floor(pos / 4) + 1}` : ''; pos++; }
     ws.push([row.pct, row.amt, '', '', row.desc, row.date, yr]);
   });
   ws.push([s.isStoda ? '99.01%' : '100.00%', Math.round(s.base), '', '', 'الإجمالي', '', '']); ws.push([]);
